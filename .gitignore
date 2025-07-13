@@ -1,5 +1,11 @@
 main.cpp
 
+# Visual Studio
+.vs/
+slam-cpp/
+slam/
+*.vcxproj
+
 # Prerequisites
 *.d
 
