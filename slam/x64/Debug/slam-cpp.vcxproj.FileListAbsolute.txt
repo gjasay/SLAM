@@ -1,3 +1,0 @@
-C:\Users\gabea\workspace\slam-cpp\x64\Debug\raylib.dll
-C:\Users\gabea\workspace\slam-cpp\x64\Debug\glfw3.dll
-C:\Users\gabea\workspace\slam-cpp\slam\x64\Debug\slam-cpp.vcxproj.Up2Date

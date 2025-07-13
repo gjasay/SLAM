@@ -1,8 +1,0 @@
-﻿  Engine.cpp
-  Camera.cpp
-  GameObject.cpp
-  main.cpp
-  Scene.cpp
-  slam.h
-  Generating Code...
-  slam-cpp.vcxproj -> C:\Users\gabea\workspace\slam-cpp\x64\Debug\slam.exe
