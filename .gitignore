@@ -5,6 +5,8 @@ main.cpp
 slam-cpp/
 slam/
 *.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
 # Prerequisites
 *.d
