@@ -1,0 +1,12 @@
+[submodule "extern/raylib"]
+	path = extern/raylib
+	url = https://github.com/raysan5/raylib.git
+[submodule "extern/joltmgit"]
+	path = extern/joltmgit
+	url = https://github.com/jrouwe/JoltPhysics.git
+[submodule "extern/jsonm"]
+	path = extern/jsonm
+	url = https://github.com/nlohmann/json.git
+[submodule "extern/raygui"]
+	path = extern/raygui
+	url = https://github.com/raysan5/raygui.git

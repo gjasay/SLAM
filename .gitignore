@@ -1,0 +1,50 @@
+# --- Build and CMake ---
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# --- Compiled binaries ---
+*.out
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+
+# --- VSCode config ---
+.vscode/
+
+# --- Raylib-specific (if building manually) ---
+raylib/
+raygui/
+physac/
+*.log
+
+# --- Mac/Linux specific ---
+.DS_Store
+*.swp
+*.swo
+
+# --- Windows specific ---
+Thumbs.db
+ehthumbs.db
+*.user
+*.VC.db
+
+# --- Git ---
+*.orig
+
+# --- Crash dumps / core dumps ---
+core
+*.stackdump
+
+# --- Other ---
+*.tmp
+*.bak
+*.old
+*.save
