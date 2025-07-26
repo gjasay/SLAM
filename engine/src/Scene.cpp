@@ -1,6 +1,5 @@
 #include "../include/Scene.h"
 #include "../include/Camera.h"
-#include "../include/GameObject.h"
 #include "../include/Engine.h"
 #include <iostream>
 #include <string>
@@ -8,43 +7,32 @@
 
 namespace slam
 {
-	Scene::Scene(std::string name, std::unique_ptr<FPCamera> camera, int width, int height)
-		: Name(name), m_camera(std::move(camera)), m_renderTexture(LoadRenderTexture(width, height)) {}
+	Scene::Scene(const std::string &name, const int width, const int height)
+		: Name(name), m_renderTexture(LoadRenderTexture(width, height)) {
+		auto camera = this->CreateEntity("Camera");
+		auto camCtrl = _ecs.AddComponent<PlayerCameraController>(camera);
+		camCtrl->entity = &camera;
+		m_active3DCamera = camCtrl->GetCamera();
+	}
 
 	Scene::~Scene() {
-		for (auto& gameObject : m_gameObjects) {
-			if (gameObject) {
-				gameObject->OnExit();
-			}
-		}
-		m_gameObjects.clear();
-		m_gameObjectMap.clear();
-		if (m_camera) {
-			m_camera.reset();
-		}
 		UnloadRenderTexture(m_renderTexture);
 		std::cout << "Scene destroyed!" << std::endl;
 	}
 
-	void Scene::_update(float dt) {
-		this->OnUpdate(dt);
+	void Scene::_update(const float dt) const {
+		const auto scriptComponents = _ecs.GetAllComponents<ScriptComponent>();
 
-		if (m_camera) {
-			Scene::m_camera->Update(dt);
-		}
-
-		for (auto& gameObject : m_gameObjects) {
-			if (gameObject) {
-				gameObject->Update(dt);
-			}
+		for (const auto* scriptComponent : scriptComponents) {
+			scriptComponent->Update(dt);
 		}
 	}
 
 	void Scene::_render() {
-		if (m_camera) {
+		if (m_active3DCamera) {
 			BeginTextureMode(m_renderTexture);
 			ClearBackground(RAYWHITE);
-			BeginMode3D(*m_camera->GetCamera());
+			BeginMode3D(*m_active3DCamera);
 			render3D();
 			EndMode3D();
 			render2D();
@@ -58,48 +46,33 @@ namespace slam
 		}
 	}
 
-	void Scene::_draw() {
+	void Scene::_draw() const {
 		DrawTextureRec(m_renderTexture.texture,
-			{ 0, 0, (float)m_renderTexture.texture.width, (float)-m_renderTexture.texture.height },
+			{ 0, 0, static_cast<float>(m_renderTexture.texture.width), static_cast<float>(-m_renderTexture.texture.height) },
 			Position, WHITE);
 	}
 
-	void Scene::render3D() {
-		if (m_camera) {
-			for (auto& gameObject : m_gameObjects) {
-				if (gameObject) {
-					gameObject->_Draw();
-				}
-			}
+	void Scene::render3D() const {
+		if (m_active3DCamera) {
+			RenderMeshes(_ecs);
 		}
 	}
 
 	void Scene::render2D() {}
 
-	Camera3D* Scene::_getActiveCamera() {
-		return m_camera ? m_camera->GetCamera() : nullptr;
+	Entity Scene::CreateEntity(const std::string &name) {
+		Entity entity = _ecs.createEntity(name);
+		 _ecs.AddComponent<Transform>(entity);
+		return entity;
 	}
 
-	void Scene::AddGameObject(std::unique_ptr<GameObject> obj) {
-		if (!obj) { std::cerr << "Attempted to add a null GameObject!" << std::endl; return; }
-
-		if (m_gameObjectMap.find(obj->Name) != m_gameObjectMap.end()) {
-			std::cerr << "GameObject with name '" << obj->Name << "' already exists in the scene!" << std::endl;
-			return;
-		}
-
-		obj->OnEnter();
-		m_gameObjectMap[obj->Name] = obj.get();
-		m_gameObjects.push_back(std::move(obj));
-	}
-
-	void Scene::StartScene(std::unique_ptr<Scene> scene) {
+	void Scene::StartScene(std::unique_ptr<Scene> scene) const {
 		if (m_engine) {
 			m_engine->SetScene(std::move(scene));
 		}
 	}
 
-	void Scene::LoadScene(std::unique_ptr<Scene> scene) {
+	void Scene::LoadScene(std::unique_ptr<Scene> scene) const {
 		if (m_engine) {
 			m_engine->AddScene(std::move(scene));
 		}

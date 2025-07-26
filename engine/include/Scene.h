@@ -7,60 +7,76 @@
 #include <iostream>
 #include <type_traits>
 
+#include "Entity.h"
+#include "ECS.h"
+
 namespace slam {
-	class FPCamera;
-	class GameObject;
+	class PlayerCameraController;
 	class Engine;
 
 	class Scene
 	{
 	public:
-		Scene(std::string name, std::unique_ptr<FPCamera> camera = nullptr, int width = 800, int height = 600);
+		explicit Scene(const std::string &name, int width = 800, int height = 600);
 		~Scene();
 
 		std::string Name;
 		Vector2 Position = { 0, 0 };
+		ECS _ecs = ECS(this);
 
-		// Internal methods
+		// Internal methods TODO: make private and make Engine a friend class
 		void _render();
-		void _draw();
-		void _update(float dt);
-		Camera3D* _getActiveCamera();
+		void _draw() const;
+		void _update(float dt) const;
 		void _setEngine(Engine* eng) { m_engine = eng; }
 
-		// Scene lifecycle methods
-		virtual void OnEnter() {}
-		virtual void OnExit() {}
-		virtual void OnUpdate(float dt) {}
+		Entity CreateEntity(const std::string &name);
 
-		void AddGameObject(std::unique_ptr<GameObject> obj);
-		void DestroyGameObject(GameObject* obj) {}  // TODO: Implement proper destruction logic
-
-		template <typename T>
-		T* GetGameObjectByName(std::string name) {
-			static_assert(std::is_base_of<GameObject, T>::value, "T must be derived from GameObject");
-
-			auto it = m_gameObjectMap.find(name);
-			if (it != m_gameObjectMap.end()) {
-				return dynamic_cast<T*>(it->second);
-			}
-
-			std::cerr << "GameObject with name '" << name << "' not found in the scene!" << std::endl;
-			return nullptr;
-		}
-
-		void StartScene(std::unique_ptr<Scene> scene);
-		void LoadScene(std::unique_ptr<Scene> scene);
+		void StartScene(std::unique_ptr<Scene> scene) const;
+		void LoadScene(std::unique_ptr<Scene> scene) const;
 		void Destroy();
 
+		// Forward ECS methods
+		template <typename Component>
+		Component* GetComponent(const Entity& entity) {
+			return _ecs.GetComponent<Component>(entity);
+		}
+
+		template <typename Component>
+		Component* AddComponent(Entity& entity) {
+			Component* instance = _ecs.AddComponent<Component>(entity);
+
+			if constexpr (std::is_base_of_v<Script, Component>) {
+				instance._setScene(this);
+			}
+			return instance;
+		}
+
+		template <typename Component>
+		bool HasComponent(const Entity& entity) const {
+			return _ecs.HasComponent<Component>(entity);
+		}
+
+		template <typename Component>
+		void RemoveComponent(const Entity& entity) {
+			_ecs.RemoveComponent<Component>(entity);
+		}
+
+		template <typename Component>
+		std::vector<Component*> GetAllComponents() const {
+			return _ecs.GetAllComponents<Component>();
+		}
+
+		std::vector<Entity> GetAllEntities() const {
+			return _ecs.GetAllEntities();
+		}
+
 	private:
-		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
-		std::unordered_map<std::string, GameObject*> m_gameObjectMap;
-		std::unique_ptr<FPCamera> m_camera;
+		::Camera3D* m_active3DCamera;
 		Engine* m_engine = nullptr;
 		RenderTexture m_renderTexture;
 
-		void render3D();
+		void render3D() const;
 		void render2D();
 	};
 }

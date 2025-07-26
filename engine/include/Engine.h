@@ -9,7 +9,7 @@ namespace slam {
 	class Engine
 	{
 	public:
-		Engine(int windowWidth = 800, int windowHeight = 600, const char* windowTitle = "SLAM")
+		explicit Engine(const int windowWidth = 800, const int windowHeight = 600, const char* windowTitle = "SLAM")
 			: m_windowWidth(windowWidth), m_windowHeight(windowHeight), m_windowTitle(windowTitle) {
 			InitWindow(m_windowWidth, m_windowHeight, m_windowTitle);
 			SetTargetFPS(60);

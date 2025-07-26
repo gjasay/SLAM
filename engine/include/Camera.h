@@ -1,7 +1,8 @@
 #pragma once
 #include "raylib.h"
 #include "raymath.h"
-#include "GameObject.h"
+#include "Entity.h"
+#include "Script.h"
 
 namespace slam
 {
@@ -11,32 +12,25 @@ namespace slam
 		ORTHOGRAPHIC = CAMERA_ORTHOGRAPHIC
 	};
 
-	//class Camera : public GameObject
-	//{
-	//public:
-	//	Camera(std::string name, Vector3 pos, Vector3 rot = { 0, 1, 0 });
-
-	//	Vector3 Target;
-	//	Vector3 Up;
-	//	float Fovy;
-	//	ProjectionType Projection;
-	//	void _Draw() override {}
-	//};
-
-	class FPCamera : public GameObject
+	class PlayerCameraController : public Script
 	{
 	public:
-		FPCamera(Vector3 pos);
-
+		PlayerCameraController();
 		float Speed;
 		float Sensitivity;
 
+
+		PlayerCameraController(Entity *entity, Scene *scene);
+
+		void OnEnter() override;
 		void Update(float dt) override;
+		void OnExit() override;
 
 		Camera* GetCamera() { return &m_camera; } // Get the camera for rendering
 
 	private:
 		Camera m_camera;
 		Vector3 m_lookDirection;
+		Transform* transform;
 	};
 }

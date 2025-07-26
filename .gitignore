@@ -19,6 +19,9 @@ Makefile
 # --- VSCode config ---
 .vscode/
 
+# --- Zed config ---
+.zed/
+
 # --- Raylib-specific (if building manually) ---
 raylib/
 raygui/

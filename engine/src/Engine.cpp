@@ -8,13 +8,9 @@ namespace slam {
 			return;
 		}
 
-		for (auto& activeScene : m_activeScenes) {
-			activeScene->OnExit();
-		}
 		m_activeScenes.clear();
 		m_sceneMap.clear();
 		scene->_setEngine(this);
-		scene->OnEnter();
 		m_sceneMap[scene->Name] = scene.get();
 		m_activeScenes.push_back(std::move(scene));
 	}
@@ -27,7 +23,6 @@ namespace slam {
 			return;
 		}
 
-		scene->OnEnter();
 		m_sceneMap[scene->Name] = scene.get();
 		m_activeScenes.push_back(std::move(scene));
 	}
@@ -74,7 +69,6 @@ namespace slam {
 		for (Scene* toRemove : m_scenesToRemove) {
 			for (auto it = m_activeScenes.begin(); it != m_activeScenes.end(); ++it) {
 				if (it->get() == toRemove) {
-					it->get()->OnExit();
 					m_sceneMap.erase(it->get()->Name);
 					m_activeScenes.erase(it);
 					break;

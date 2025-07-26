@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(YourProjectName VERSION 0.1 LANGUAGES CXX)
+project(SLAM VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,7 +26,10 @@ file(GLOB_RECURSE ENGINE_SOURCES
     engine/include/*.h
 )
 
-add_library(engine STATIC ${ENGINE_SOURCES})
+add_library(engine STATIC ${ENGINE_SOURCES}
+        engine/include/Script.h
+        engine/include/ECS.h
+        engine/src/Script.cpp)
 
 target_include_directories(engine PUBLIC
     engine/include

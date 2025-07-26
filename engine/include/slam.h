@@ -1,4 +1,4 @@
-#pragma once
+
 
 // Standard library dependencies
 #include <string>
@@ -15,6 +15,8 @@
 
 // Project dependencies
 #include "Camera.h"
-#include "GameObject.h"
+#include "Entity.h"
 #include "Scene.h"
 #include "Engine.h"
+#include "ECS.h"
+#include "Script.h"
