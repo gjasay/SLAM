@@ -25,7 +25,16 @@ int main()
     cubeRenderer->Color = {255, 0, 0, 255};
 
     //ui
-    scene->canvas.AddElement(std::make_unique<slam::ui::Panel>(Vector2{0, 0}, 200, 200));
+    const auto myPanel = scene->canvas.AddElement(std::make_unique<slam::ui::Panel>(Vector2{300, 150}, 200, 200));
+    scene->canvas.styles.AddRule(".myStyle")
+        .borderWidth(5)
+        .backgroundColor({0, 255, 0, 255})
+        .borderColor({0, 0, 0, 255});
+
+    myPanel->classes.emplace_back("myStyle");
+    myPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{10, 10}, 60, 60))->classes.emplace_back("myStyle");
+    myPanel->classes.emplace_back("myStyle");
+
     engine.SetScene(std::move(scene));
     engine.Run();
 }

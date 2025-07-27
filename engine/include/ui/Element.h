@@ -1,17 +1,27 @@
 #pragma once
 #include <memory>
 #include <vector>
+
+#include "Style.h"
 #include "raylib.h"
 
 #include "Vector.h"
 
+
 namespace slam::ui {
+  class Canvas;
 
   class Element {
   public:
-    explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0)
-      : position(position), width(width), height(height) {}
+    explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0) :
+        position(position), width(width), height(height) {}
+
     virtual ~Element() = default;
+
+    std::string id;
+    std::vector<std::string> classes;
+
+    Canvas *canvas;
 
     int zIndex = 0;
     bool visible = true;
@@ -19,22 +29,20 @@ namespace slam::ui {
     int width = 0;
     int height = 0;
 
-    void AddChild(std::unique_ptr<Element> child) {
+    Element* AddChild(std::unique_ptr<Element> child) {
+      child->canvas = canvas;
       children.emplace_back(std::move(child));
+      return children.back().get();
     }
 
-    virtual void Draw(Vector2 offset) { }
+    virtual void Draw(Style style, Vector2 offset) {}
 
   protected:
     std::vector<std::unique_ptr<Element>> children;
 
   private:
-    void _draw(Vector2 offset = {0, 0}) {
-      Draw(offset);
-      for (const auto & child : children) {
-        child->_draw(offset + position);
-      }
-    }
+
+    void _draw(const Vector2 offset = {0, 0});
 
     friend class Canvas;
   };
@@ -43,6 +51,6 @@ namespace slam::ui {
   public:
     Panel(const Vector2 position, const int width, const int height) : Element(position, width, height) {}
 
-    void Draw(Vector2 offset) override;
+    void Draw(Style style, Vector2 offset) override;
   };
 }

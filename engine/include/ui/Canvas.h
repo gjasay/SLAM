@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include "Element.h"
+#include "Style.h"
 
 namespace slam::ui {
   class Canvas {
@@ -9,7 +10,9 @@ namespace slam::ui {
     Canvas() = default;
     ~Canvas() = default;
 
-    void AddElement(std::unique_ptr<Element> element);
+    StyleManager styles;
+
+    Element* AddElement(std::unique_ptr<Element> element);
     void RemoveElement(Element* element);
     void Draw() const;
 

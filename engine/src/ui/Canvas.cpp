@@ -2,8 +2,10 @@
 #include <algorithm>
 
 namespace slam::ui {
-  void Canvas::AddElement(std::unique_ptr<Element> element) {
+  Element* Canvas::AddElement(std::unique_ptr<Element> element) {
+    element->canvas = this;
     elements.emplace_back(std::move(element));
+    return elements.back().get();
   }
 
   void Canvas::RemoveElement(Element* element) {
@@ -19,6 +21,4 @@ namespace slam::ui {
       element->_draw();
     }
   }
-
-
 }

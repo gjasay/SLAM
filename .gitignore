@@ -22,10 +22,14 @@ Makefile
 # --- Zed config ---
 .zed/
 
+# --- CLion config ---
+.idea/
+
 # --- Raylib-specific (if building manually) ---
 raylib/
 raygui/
-physac/
+joltmgit/
+jsonm/
 *.log
 
 # --- Mac/Linux specific ---

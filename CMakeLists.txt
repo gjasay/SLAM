@@ -34,6 +34,8 @@ add_library(engine STATIC
     engine/src/Script.cpp
     engine/src/ui/Canvas.cpp
         engine/src/ui/Element.cpp
+        engine/include/ui/Style.h
+        engine/src/ui/Style.cpp
 )
 
 target_include_directories(engine PUBLIC
