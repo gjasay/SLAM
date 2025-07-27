@@ -53,4 +53,20 @@ namespace slam::ui {
 
     void Draw(Style style, Vector2 offset) override;
   };
+
+  class Button : public Element {
+    public:
+    Button(const Vector2 position, const int width, const int height) : Element(position, width, height) {}
+
+    void Draw(Style style, Vector2 offset) override;
+  };
+
+  class Text : public Element {
+  public:
+    Text(const std::string &text, const Vector2 position, const int width, const int height) : Element(position, width, height), _text(text) { }
+    void Draw(Style style, Vector2 offset) override;
+
+  private:
+    std::string _text;
+  };
 }

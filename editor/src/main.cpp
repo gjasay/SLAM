@@ -14,6 +14,9 @@ public:
     }
 };
 
+class MyPanel final : public slam::ui::Panel {
+};
+
 int main()
 {
     slam::Engine engine(800, 600, "SLAM Editor");
@@ -29,10 +32,18 @@ int main()
     scene->canvas.styles.AddRule(".myStyle")
         .borderWidth(5)
         .backgroundColor({0, 255, 0, 255})
-        .borderColor({0, 0, 0, 255});
+        .borderColor({0, 0, 0, 255})
+        .color({255, 0, 0, 255})
+        .fontSize(20)
+        .borderRadius(0.1f)
+        .flex(true)
+        .flexDirection(slam::ui::FlexDirection::Row)
+        .flexGap(12);
 
     myPanel->classes.emplace_back("myStyle");
-    myPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{10, 10}, 60, 60))->classes.emplace_back("myStyle");
+    myPanel->AddChild(std::make_unique<slam::ui::Text>("poop", Vector2{10, 10}, 60, 60))->classes.emplace_back("myStyle");
+    myPanel->AddChild(std::make_unique<slam::ui::Text>("sock", Vector2{10, 10}, 60, 60))->classes.emplace_back("myStyle");
+    myPanel->AddChild(std::make_unique<slam::ui::Text>("another option", Vector2{10, 10}, 60, 60))->classes.emplace_back("myStyle");
     myPanel->classes.emplace_back("myStyle");
 
     engine.SetScene(std::move(scene));
