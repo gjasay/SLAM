@@ -22,9 +22,8 @@ namespace slam
 
 		PlayerCameraController(Entity *entity, Scene *scene);
 
-		void OnEnter() override;
+		void Awake() override;
 		void Update(float dt) override;
-		void OnExit() override;
 
 		Camera* GetCamera() { return &m_camera; } // Get the camera for rendering
 

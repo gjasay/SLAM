@@ -9,7 +9,7 @@ namespace slam {
 		std::string name;
 		std::vector<std::string> tags;
 
-		Entity(size_t id, const std::string& name = "") : id(id), name(name) { }
+		explicit Entity(const size_t id, const std::string& name = "") : id(id), name(name) { }
 
 		bool operator==(const Entity& other) const {
 			return id == other.id;

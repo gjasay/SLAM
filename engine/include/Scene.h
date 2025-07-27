@@ -1,11 +1,8 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include <unordered_map>
 #include <raylib.h>
 #include <string>
-#include <iostream>
-#include <type_traits>
 
 #include "Entity.h"
 #include "ECS.h"
@@ -20,12 +17,16 @@ namespace slam {
 		explicit Scene(const std::string &name, int width = 800, int height = 600);
 		~Scene();
 
-		std::string Name;
-		Vector2 Position = { 0, 0 };
+		std::string name;
+		Vector2 position = { 0, 0 };
+    ui::Canvas canvas;
+
 		ECS _ecs = ECS(this);
 
+
 		// Internal methods TODO: make private and make Engine a friend class
-		void _render();
+		void _render() const;
+		void _enter() const;
 		void _draw() const;
 		void _update(float dt) const;
 		void _setEngine(Engine* eng) { m_engine = eng; }
@@ -44,12 +45,7 @@ namespace slam {
 
 		template <typename Component>
 		Component* AddComponent(Entity& entity) {
-			Component* instance = _ecs.AddComponent<Component>(entity);
-
-			if constexpr (std::is_base_of_v<Script, Component>) {
-				instance._setScene(this);
-			}
-			return instance;
+			return _ecs.AddComponent<Component>(entity);
 		}
 
 		template <typename Component>
@@ -76,7 +72,7 @@ namespace slam {
 		Engine* m_engine = nullptr;
 		RenderTexture m_renderTexture;
 
-		void render3D() const;
-		void render2D();
+		void _render3D() const;
+		void _render2D() const;
 	};
 }

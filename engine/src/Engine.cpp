@@ -10,21 +10,18 @@ namespace slam {
 
 		m_activeScenes.clear();
 		m_sceneMap.clear();
-		scene->_setEngine(this);
-		m_sceneMap[scene->Name] = scene.get();
-		m_activeScenes.push_back(std::move(scene));
+
+		_stageScene(std::move(scene));
 	}
 
 	void Engine::AddScene(std::unique_ptr<Scene> scene) {
 		if (!scene) { std::cerr << "Attempted to add a null Scene!" << std::endl; return; }
 
-		if (m_sceneMap.find(scene->Name) != m_sceneMap.end()) {
-			std::cerr << "Scene with name '" << scene->Name << "' already exists!" << std::endl;
-			return;
+		if (m_sceneMap.find(scene->name) != m_sceneMap.end()) {
+			std::cerr << "Scene with name '" << scene->name << "' already exists!" << std::endl;
 		}
 
-		m_sceneMap[scene->Name] = scene.get();
-		m_activeScenes.push_back(std::move(scene));
+		_stageScene(std::move(scene));
 	}
 
 	void Engine::RemoveScene(Scene* scene) {
@@ -33,7 +30,7 @@ namespace slam {
 			return;
 		}
 
-		m_scenesToRemove.push_back(scene);
+		m_scenesToRemove.emplace_back(scene);
 	}
 
 	void Engine::Run() {
@@ -56,7 +53,7 @@ namespace slam {
 					}
 				}
 				EndDrawing();
-				cleanupRemovedScenes();
+				_cleanupRemovedScenes();
 			}
 			else {
 				std::cerr << "No active scenes to render!" << std::endl;
@@ -65,11 +62,19 @@ namespace slam {
 		CloseWindow();
 	}
 
-	void Engine::cleanupRemovedScenes() {
+	void Engine::_stageScene(std::unique_ptr<Scene> scene) {
+		scene->_setEngine(this);
+		m_sceneMap[scene->name] = scene.get();
+		m_activeScenes.push_back(std::move(scene));
+		m_activeScenes.back()->_enter();
+	}
+
+
+	void Engine::_cleanupRemovedScenes() {
 		for (Scene* toRemove : m_scenesToRemove) {
 			for (auto it = m_activeScenes.begin(); it != m_activeScenes.end(); ++it) {
 				if (it->get() == toRemove) {
-					m_sceneMap.erase(it->get()->Name);
+					m_sceneMap.erase(it->get()->name);
 					m_activeScenes.erase(it);
 					break;
 				}

@@ -20,7 +20,7 @@ namespace slam {
         m_camera.projection = CAMERA_PERSPECTIVE;
     }
 
-    void PlayerCameraController::OnEnter() {}
+    void PlayerCameraController::Awake() {}
 
     void PlayerCameraController::Update(const float dt) {
         Vector2 mouseDelta = GetMouseDelta();
@@ -30,8 +30,8 @@ namespace slam {
         if (transform->Rotation.y > 89.0f) transform->Rotation.y = 89.0f;
         if (transform->Rotation.y < -89.0f) transform->Rotation.y = -89.0f;
 
-        float radYaw = transform->Rotation.z * DEG2RAD;
-        float radPitch = transform->Rotation.y * DEG2RAD;
+        const float radYaw = transform->Rotation.z * DEG2RAD;
+        const float radPitch = transform->Rotation.y * DEG2RAD;
 
         m_lookDirection.x = cosf(radYaw) * cosf(radPitch);
         m_lookDirection.y = sinf(radPitch);
@@ -57,6 +57,4 @@ namespace slam {
 
         m_camera.target = Vector3Add(m_camera.position, m_lookDirection);
     }
-
-    void PlayerCameraController::OnExit() {}
 }

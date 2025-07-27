@@ -16,9 +16,8 @@ namespace slam {
 
         virtual ~Script();
 
-        virtual void OnEnter() {};
+        virtual void Awake() {};
         virtual void Update(float dt) {};
-        virtual void OnExit() {};
     };
 
     // Component that holds a script instance for an entity
@@ -27,19 +26,13 @@ namespace slam {
 
         void OnEnter() const {
             for (auto& script : Scripts) {
-                script->OnEnter();
+                script->Awake();
             }
         }
 
         void Update(const float dt) const {
             for (auto& script : Scripts) {
                 script->Update(dt);
-            }
-        }
-
-        void OnExit() const {
-            for (auto& script : Scripts) {
-                script->OnExit();
             }
         }
     };

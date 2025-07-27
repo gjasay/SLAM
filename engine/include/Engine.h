@@ -17,7 +17,7 @@ namespace slam {
 
 		void SetScene(std::unique_ptr<Scene> scene);
 		void AddScene(std::unique_ptr<Scene> scene);
-		void RemoveScene(Scene* scene);
+		void RemoveScene(Scene *scene);
 		void Run();
 
 	private:
@@ -27,7 +27,8 @@ namespace slam {
 		std::unordered_map<std::string, Scene*> m_sceneMap;
 		std::vector<Scene*> m_scenesToRemove;
 
-		void cleanupRemovedScenes();
+		void _stageScene(std::unique_ptr<Scene> scene);
+		void _cleanupRemovedScenes();
 	};
 
 };

@@ -26,10 +26,15 @@ file(GLOB_RECURSE ENGINE_SOURCES
     engine/include/*.h
 )
 
-add_library(engine STATIC ${ENGINE_SOURCES}
-        engine/include/Script.h
-        engine/include/ECS.h
-        engine/src/Script.cpp)
+add_library(engine STATIC
+    engine/src/Camera.cpp
+    engine/src/ECS.cpp
+    engine/src/Engine.cpp
+    engine/src/Scene.cpp
+    engine/src/Script.cpp
+    engine/src/ui/Canvas.cpp
+        engine/src/ui/Element.cpp
+)
 
 target_include_directories(engine PUBLIC
     engine/include
@@ -50,7 +55,8 @@ file(GLOB_RECURSE EDITOR_SOURCES
     editor/include/*.h
 )
 
-add_executable(editor ${EDITOR_SOURCES})
+add_executable(editor ${EDITOR_SOURCES}
+        engine/include/Vector.h)
 
 target_include_directories(editor PUBLIC
     editor/include

@@ -8,7 +8,7 @@
 namespace slam
 {
 	Scene::Scene(const std::string &name, const int width, const int height)
-		: Name(name), m_renderTexture(LoadRenderTexture(width, height)) {
+		: name(name), m_renderTexture(LoadRenderTexture(width, height)) {
 		auto camera = this->CreateEntity("Camera");
 		auto camCtrl = _ecs.AddComponent<PlayerCameraController>(camera);
 		camCtrl->entity = &camera;
@@ -20,6 +20,17 @@ namespace slam
 		std::cout << "Scene destroyed!" << std::endl;
 	}
 
+	void Scene::_enter() const {
+		const auto entities = _ecs.GetAllEntities();
+
+		for (const auto& entity : entities) {
+			if (_ecs.HasComponent<ScriptComponent>(entity)) {
+				const auto& scriptComponent = _ecs.GetComponent<ScriptComponent>(entity);
+				scriptComponent.OnEnter();
+			}
+		}
+	}
+
 	void Scene::_update(const float dt) const {
 		const auto scriptComponents = _ecs.GetAllComponents<ScriptComponent>();
 
@@ -28,20 +39,20 @@ namespace slam
 		}
 	}
 
-	void Scene::_render() {
+	void Scene::_render() const {
 		if (m_active3DCamera) {
 			BeginTextureMode(m_renderTexture);
 			ClearBackground(RAYWHITE);
 			BeginMode3D(*m_active3DCamera);
-			render3D();
+			_render3D();
 			EndMode3D();
-			render2D();
+			_render2D();
 			EndTextureMode();
 		}
 		else {
 			BeginTextureMode(m_renderTexture);
 			ClearBackground(RAYWHITE);
-			render2D();
+			_render2D();
 			EndTextureMode();
 		}
 	}
@@ -49,19 +60,21 @@ namespace slam
 	void Scene::_draw() const {
 		DrawTextureRec(m_renderTexture.texture,
 			{ 0, 0, static_cast<float>(m_renderTexture.texture.width), static_cast<float>(-m_renderTexture.texture.height) },
-			Position, WHITE);
+			position, WHITE);
 	}
 
-	void Scene::render3D() const {
+	void Scene::_render3D() const {
 		if (m_active3DCamera) {
 			RenderMeshes(_ecs);
 		}
 	}
 
-	void Scene::render2D() {}
+	void Scene::_render2D() const {
+	  canvas.Draw();
+	}
 
 	Entity Scene::CreateEntity(const std::string &name) {
-		Entity entity = _ecs.createEntity(name);
+		Entity entity = _ecs.CreateEntity(name);
 		 _ecs.AddComponent<Transform>(entity);
 		return entity;
 	}

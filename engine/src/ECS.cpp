@@ -1,6 +1,5 @@
 #include "../include/ECS.h"
 #include "raymath.h"
-#include <iostream>
 
 void slam::RenderMeshes(const slam::ECS& ecs) {
     for (const auto& entity : ecs.GetAllEntities()) {
