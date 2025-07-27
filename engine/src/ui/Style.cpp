@@ -48,6 +48,10 @@ namespace slam::ui {
       base.flexGap = add.flexGap;
     if (add.flexDirection != FlexDirection::Row)
       base.flexDirection = add.flexDirection;
+    if (add.justifyContent != JustifyContent::FlexStart)
+      base.justifyContent = add.justifyContent;
+    if (add.alignItems != AlignItems::FlexStart)
+      base.alignItems = add.alignItems;
   }
 
 }

@@ -63,7 +63,9 @@ namespace slam::ui {
 
   class Text : public Element {
   public:
-    Text(const std::string &text, const Vector2 position, const int width, const int height) : Element(position, width, height), _text(text) { }
+    Text(const std::string &text, const Vector2 position) : Element(position), _text(text) {
+      height = 20;
+    }
     void Draw(Style style, Vector2 offset) override;
 
   private:

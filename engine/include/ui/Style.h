@@ -12,6 +12,20 @@ namespace slam::ui {
     Column
   };
 
+  enum class JustifyContent {
+    FlexStart,
+    FlexEnd,
+    Center,
+    SpaceBetween,
+  };
+
+  enum class AlignItems {
+    FlexStart,
+    FlexEnd,
+    Center,
+    Stretch,
+  };
+
   struct Style {
     int borderWidth = 0;
     int padding = 0;
@@ -21,8 +35,10 @@ namespace slam::ui {
     int fontSize = 20;
     float borderRadius = 0.0f;
     bool flex = false;
-    int flexGap = 0;
+    mutable int flexGap = 0;
     FlexDirection flexDirection = FlexDirection::Row;
+    JustifyContent justifyContent = JustifyContent::FlexStart;
+    AlignItems alignItems = AlignItems::FlexStart;
   };
 
   class StyleManager {
@@ -42,6 +58,9 @@ namespace slam::ui {
       RuleBuilder& flex(const bool enable) { style.flex = enable; return *this; }
       RuleBuilder& flexGap(const int gap) { style.flexGap = gap; return *this; }
       RuleBuilder& flexDirection(const FlexDirection direction) { style.flexDirection = direction; return *this; }
+      RuleBuilder& justifyContent(const JustifyContent justify) { style.justifyContent = justify; return *this; }
+      RuleBuilder& alignItems(const AlignItems align) { style.alignItems = align; return *this; }
+
       // add more setters for CSS-like properties
 
       ~RuleBuilder() {
@@ -62,7 +81,6 @@ namespace slam::ui {
 
   private:
     std::unordered_map<std::string, Style> rules;
-
     static void merge(Style& base, const Style& add);
   };
 
