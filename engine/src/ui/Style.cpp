@@ -2,6 +2,24 @@
 #include "../include/ui/Element.h"
 
 namespace slam::ui {
+
+  void StyleManager::merge(Style &base, const Style &add) {
+    const Style defaultStyle;
+#define STYLE_FIELD(type, name, ...) mergeField(base.name, add.name, defaultStyle.name);
+    STYLE_PROPERTIES
+#undef STYLE_FIELD
+  }
+
+  void StyleManager::mergeInline(Style &base, const Style &inlineStyle) {
+    const Style defaultInline;
+#define STYLE_FIELD(type, name, ...) \
+  if (inlineStyle.name != defaultInline.name) \
+    base.name = inlineStyle.name;
+    STYLE_PROPERTIES
+#undef STYLE_FIELD
+
+  }
+
   Style StyleManager::Resolve(const Element *e) const {
     Style out;
     out.backgroundColor = WHITE;
@@ -23,35 +41,11 @@ namespace slam::ui {
         merge(out, idIt->second);
     }
 
+    if (e->inlineStyle)
+      mergeInline(out, *e->inlineStyle);
+
     return out;
   }
 
-  void StyleManager::merge(Style &base, const Style &add) {
-    // override non-default fields; extend as needed
-    if (add.borderWidth != 0)
-      base.borderWidth = add.borderWidth;
-    if (add.padding != 0)
-      base.padding = add.padding;
-    if (add.backgroundColor.a != 0)
-      base.backgroundColor = add.backgroundColor;
-    if (add.borderColor.a != 0)
-      base.borderColor = add.borderColor;
-    if (add.color.a != 0)
-      base.color = add.color;
-    if (add.fontSize != 20)
-      base.fontSize = add.fontSize;
-    if (add.borderRadius != 0.0f)
-      base.borderRadius = add.borderRadius;
-    if (add.flex)
-      base.flex = add.flex;
-    if (add.flexGap != 0)
-      base.flexGap = add.flexGap;
-    if (add.flexDirection != FlexDirection::Row)
-      base.flexDirection = add.flexDirection;
-    if (add.justifyContent != JustifyContent::FlexStart)
-      base.justifyContent = add.justifyContent;
-    if (add.alignItems != AlignItems::FlexStart)
-      base.alignItems = add.alignItems;
-  }
 
 }

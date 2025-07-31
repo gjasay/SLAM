@@ -36,6 +36,7 @@ add_library(engine STATIC
         engine/src/ui/Element.cpp
         engine/include/ui/Style.h
         engine/src/ui/Style.cpp
+        engine/include/ui/StyleFields.h
 )
 
 target_include_directories(engine PUBLIC

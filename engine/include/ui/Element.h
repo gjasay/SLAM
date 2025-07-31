@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "Style.h"
-#include "raylib.h"
 
 #include "Vector.h"
 
@@ -13,21 +12,20 @@ namespace slam::ui {
 
   class Element {
   public:
-    explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0) :
-        position(position), width(width), height(height) {}
+    explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0) {
+      inlineStyle->position = position;
+      inlineStyle->width = width;
+      inlineStyle->height = height;
+    }
 
-    virtual ~Element() = default;
+    virtual ~Element() {}
 
     std::string id;
     std::vector<std::string> classes;
 
     Canvas *canvas;
 
-    int zIndex = 0;
-    bool visible = true;
-    Vector2 position = {0, 0};
-    int width = 0;
-    int height = 0;
+    std::unique_ptr<Style> inlineStyle = std::make_unique<Style>();
 
     Element* AddChild(std::unique_ptr<Element> child) {
       child->canvas = canvas;
@@ -54,6 +52,15 @@ namespace slam::ui {
     void Draw(Style style, Vector2 offset) override;
   };
 
+  /*
+  class Slider : public Panel {
+  public:
+    Slider(const Vector2 position, const int width, const int height) : Panel(position, width, height) {
+      this->AddChild(make_unique<Panel>(Vector2{0, 0}, width, height))->id = "sliderTrack";
+    }
+  };
+  */
+
   class Button : public Element {
     public:
     Button(const Vector2 position, const int width, const int height) : Element(position, width, height) {}
@@ -63,10 +70,9 @@ namespace slam::ui {
 
   class Text : public Element {
   public:
-    Text(const std::string &text, const Vector2 position) : Element(position), _text(text) {
-      height = 20;
-    }
+    Text(const std::string &text, const Vector2 position) : Element(position), _text(text) {}
     void Draw(Style style, Vector2 offset) override;
+    const std::string& GetText() const { return _text; }
 
   private:
     std::string _text;

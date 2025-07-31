@@ -1,26 +1,33 @@
 #include "../../include/ui/Element.h"
 #include "../../include/ui/Canvas.h"
+#include "../../include/ui/Style.h"
+#include "raylib.h"
 
 namespace slam::ui {
+
   void Element::_draw(const Vector2 offset) {
-    const Style finalStyle = canvas->styles.Resolve(this);
+    Style finalStyle = canvas->styles.Resolve(this);
 
-    // If flex is enabled and children exist, compute layout with justifyContent and alignItems.
     if (finalStyle.flex && !children.empty()) {
-      // Determine main axis
       bool isRow = finalStyle.flexDirection == FlexDirection::Row;
-
-      // Sum dimensions and count gaps.
       int totalChildSize = 0;
+      // Loop to measure each child's size
       for (const auto &child: children) {
-        totalChildSize += isRow ? child->width : child->height;
+        Style childStyle = canvas->styles.Resolve(child.get());
+        // If child is a Text element, update its size using MeasureTextEx.
+        if (auto textChild = dynamic_cast<Text *>(child.get())) {
+          const auto size = MeasureTextEx(::GetFontDefault(), textChild->GetText().c_str(), childStyle.fontSize, 1.0f);
+          childStyle.width = static_cast<int>(size.x);
+          childStyle.height = static_cast<int>(size.y);
+        }
+        totalChildSize += isRow ? childStyle.width : childStyle.height;
       }
       int totalGap = finalStyle.flexGap * (children.size() - 1);
-      int containerSize = isRow ? this->width - 2 * finalStyle.padding : this->height - 2 * finalStyle.padding;
+      int containerSize =
+          isRow ? finalStyle.width - 2 * finalStyle.padding : finalStyle.height - 2 * finalStyle.padding;
       int contentSize = totalChildSize + totalGap;
       int remainingSpace = containerSize - contentSize;
 
-      // Compute offset for justifyContent on main axis.
       float mainAxisOffset = finalStyle.padding;
       switch (finalStyle.justifyContent) {
         case JustifyContent::Center:
@@ -30,7 +37,6 @@ namespace slam::ui {
           mainAxisOffset += remainingSpace;
           break;
         case JustifyContent::SpaceBetween:
-          // Overwrite flexGap if more than 1 child.
           if (children.size() > 1)
             finalStyle.flexGap = remainingSpace / (children.size() - 1);
           break;
@@ -38,12 +44,17 @@ namespace slam::ui {
           break;
       }
 
-      // Position each child.
       for (auto &child: children) {
-        // Compute cross axis offset for alignItems.
+        Style childStyle = canvas->styles.Resolve(child.get());
+        // If child is a text element, re-measure its size
+        if (auto textChild = dynamic_cast<Text *>(child.get())) {
+          const auto size = MeasureTextEx(::GetFontDefault(), textChild->GetText().c_str(), childStyle.fontSize, 1.0f);
+          childStyle.width = static_cast<int>(size.x);
+          childStyle.height = static_cast<int>(size.y);
+        }
         float crossAxisOffset = finalStyle.padding;
         if (isRow) {
-          int extra = this->height - 2 * finalStyle.padding - child->height;
+          int extra = finalStyle.height - 2 * finalStyle.padding - childStyle.height;
           switch (finalStyle.alignItems) {
             case AlignItems::Center:
               crossAxisOffset += extra / 2.0f;
@@ -54,10 +65,10 @@ namespace slam::ui {
             default:
               break;
           }
-          child->position = {mainAxisOffset, crossAxisOffset};
-          mainAxisOffset += child->width + finalStyle.flexGap;
+          childStyle.position = {mainAxisOffset, crossAxisOffset};
+          mainAxisOffset += childStyle.width + finalStyle.flexGap;
         } else {
-          int extra = this->width - 2 * finalStyle.padding - child->width;
+          int extra = finalStyle.width - 2 * finalStyle.padding - childStyle.width;
           switch (finalStyle.alignItems) {
             case AlignItems::Center:
               crossAxisOffset += extra / 2.0f;
@@ -68,47 +79,44 @@ namespace slam::ui {
             default:
               break;
           }
-          child->position = {crossAxisOffset, mainAxisOffset};
-          mainAxisOffset += child->height + finalStyle.flexGap;
+          childStyle.position = {crossAxisOffset, mainAxisOffset};
+          mainAxisOffset += childStyle.height + finalStyle.flexGap;
+        }
+        if (child->inlineStyle) {
+          child->inlineStyle->position = childStyle.position;
         }
       }
     }
 
-    // Draw the element.
-    Draw(finalStyle, offset);
-
-    // Draw children.
+    if (finalStyle.visible)
+      Draw(finalStyle, offset);
     for (const auto &child: children) {
-      child->_draw(offset + position);
+      child->_draw(offset + finalStyle.position);
     }
   }
 
   void Panel::Draw(const Style style, const Vector2 offset) {
-    const Rectangle rect = {position.x + offset.x, position.y + offset.y, static_cast<float>(width),
-                            static_cast<float>(height)};
-
+    const Rectangle rect = {style.position.x + offset.x, style.position.y + offset.y, static_cast<float>(style.width),
+                            static_cast<float>(style.height)};
     if (style.borderRadius > 0.0f) {
       DrawRectangleRounded(rect, style.borderRadius, 0, style.backgroundColor);
-      if (style.borderWidth > 0) {
+      if (style.borderWidth > 0)
         DrawRectangleRoundedLines(rect, style.borderRadius, style.borderWidth, style.borderColor);
-      }
     } else {
       DrawRectangleRec(rect, style.backgroundColor);
-      if (style.borderWidth > 0) {
+      if (style.borderWidth > 0)
         DrawRectangleLinesEx(rect, style.borderWidth, style.borderColor);
-      }
     }
   }
 
-  void Text::Draw(const Style style, const Vector2 offset) {
+  void Text::Draw(Style style, const Vector2 offset) {
     const auto size = MeasureTextEx(::GetFontDefault(), _text.c_str(), style.fontSize, 1.0f);
-    width = static_cast<int>(size.x);
-    height = static_cast<int>(size.y);
-    DrawTextEx(::GetFontDefault(), _text.c_str(), position + offset, style.fontSize, 1.0f, style.color);
-    if (style.borderWidth > 0) {
-      DrawRectangleLines(position.x + offset.x, position.y + offset.y, width, height, style.borderColor);
-    }
+    style.width = static_cast<int>(size.x);
+    style.height = static_cast<int>(size.y);
+    DrawTextEx(::GetFontDefault(), _text.c_str(), style.position + offset, style.fontSize, 1.0f, style.color);
+    if (style.borderWidth > 0)
+      DrawRectangleLines(style.position.x + offset.x, style.position.y + offset.y, style.width, style.height,
+                         style.borderColor);
   }
-
 
 } // namespace slam::ui
