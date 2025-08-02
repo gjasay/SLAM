@@ -1,5 +1,6 @@
 #include "../include/ui/Style.h"
 #include "../include/ui/Element.h"
+#include <iostream>
 
 namespace slam::ui {
 
@@ -24,6 +25,10 @@ namespace slam::ui {
     Style out;
     out.backgroundColor = WHITE;
     out.borderColor = BLACK;
+
+    if (!e) {
+      return out;
+    }
 
     auto tagIt = rules.find(typeid(*e).name());
     if (tagIt != rules.end())

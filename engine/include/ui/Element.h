@@ -1,11 +1,8 @@
 #pragma once
 #include <memory>
 #include <vector>
-
 #include "Style.h"
-
 #include "Vector.h"
-
 
 namespace slam::ui {
   class Canvas;
@@ -23,7 +20,7 @@ namespace slam::ui {
     std::string id;
     std::vector<std::string> classes;
 
-    Canvas *canvas;
+    Canvas *canvas = nullptr;
 
     std::unique_ptr<Style> inlineStyle = std::make_unique<Style>();
 
@@ -40,7 +37,7 @@ namespace slam::ui {
 
   private:
 
-    void _draw(const Vector2 offset = {0, 0});
+    void _draw(Vector2 offset = {0, 0});
 
     friend class Canvas;
   };

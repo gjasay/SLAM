@@ -3,12 +3,14 @@
 #include "../include/Engine.h"
 #include <iostream>
 #include <string>
+#include <utility>
 #include <raylib.h>
 
 namespace slam
 {
-	Scene::Scene(const std::string &name, const int width, const int height)
-		: name(name), m_renderTexture(LoadRenderTexture(width, height)) {
+	Scene::Scene(std::string name, const int width, const int height)
+		: name(std::move(name)), canvas(width, height),
+      m_renderTexture(LoadRenderTexture(width, height)) {
 		auto camera = this->CreateEntity("Camera");
 		auto camCtrl = _ecs.AddComponent<PlayerCameraController>(camera);
 		camCtrl->entity = &camera;
@@ -31,7 +33,13 @@ namespace slam
 		}
 	}
 
-	void Scene::_update(const float dt) const {
+	void Scene::_update(const float dt) {
+    if (::IsWindowResized()) {
+      UnloadRenderTexture(m_renderTexture);
+      m_renderTexture = LoadRenderTexture(::GetScreenWidth(), ::GetScreenHeight());
+      canvas.SetSize(GetScreenWidth(), GetScreenHeight());
+    }
+
 		const auto scriptComponents = _ecs.GetAllComponents<ScriptComponent>();
 
 		for (const auto* scriptComponent : scriptComponents) {
@@ -39,7 +47,7 @@ namespace slam
 		}
 	}
 
-	void Scene::_render() const {
+	void Scene::_render() {
 		if (m_active3DCamera) {
 			BeginTextureMode(m_renderTexture);
 			ClearBackground(RAYWHITE);
@@ -69,7 +77,7 @@ namespace slam
 		}
 	}
 
-	void Scene::_render2D() const {
+	void Scene::_render2D() {
 	  canvas.Draw();
 	}
 

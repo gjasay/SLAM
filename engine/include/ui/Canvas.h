@@ -5,18 +5,16 @@
 #include "Style.h"
 
 namespace slam::ui {
-  class Canvas {
+  class Canvas final : private Element {
   public:
-    Canvas() = default;
-    ~Canvas() = default;
+    Canvas(int width, int height);
 
     StyleManager styles;
 
-    Element* AddElement(std::unique_ptr<Element> element);
-    void RemoveElement(Element* element);
-    void Draw() const;
-
-  private:
-    std::vector<std::unique_ptr<Element>> elements;
+    Element *AddElement(std::unique_ptr<Element> element);
+    void RemoveElement(Element *element);
+    void Draw(Style style = Style(), Vector2 offset = {0,0}) override;
+    void SetSize(int width, int height) const;
   };
-}
+
+}; // namespace slam::ui

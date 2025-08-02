@@ -30,6 +30,8 @@ int main(int argc, char* argv[])
 {
     slam::io::FileSystem::Initialize(argv[0]);
 
+    ::SetConfigFlags(::FLAG_WINDOW_RESIZABLE);
+
     slam::Engine engine(800, 600, "SLAM Editor");
     auto scene = std::make_unique<slam::Scene>("MainScene");
     auto cube = scene->CreateEntity("");
@@ -42,10 +44,8 @@ int main(int argc, char* argv[])
     slam::io::StyleSheetParser styleParser(scene->canvas.styles);
     styleParser.Parse(slam::io::FileSystem::GetResourcePath("styles.sss"));
 
-    const auto outerPanel = scene->canvas.AddElement(std::make_unique<slam::ui::Element>(Vector2{0, 0}, 800, 600));
-    const auto innerPanel = outerPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200));
-    outerPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200))->classes.emplace_back("innerStyle");
-    outerPanel->id = "outerPanel";
+    const auto innerPanel = scene->canvas.AddElement(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200));
+    scene->canvas.AddElement(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200))->classes.emplace_back("innerStyle");
     innerPanel->id = "innerPanel";
     innerPanel->AddChild(std::make_unique<slam::ui::Text>("one", Vector2{0, 0}))->classes.emplace_back("textStyle");
     innerPanel->AddChild(std::make_unique<slam::ui::Text>("two", Vector2{0, 0}))->classes.emplace_back("textStyle");

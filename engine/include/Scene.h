@@ -14,7 +14,7 @@ namespace slam {
 	class Scene
 	{
 	public:
-		explicit Scene(const std::string &name, int width = 800, int height = 600);
+		explicit Scene(std::string name, int width = 800, int height = 600);
 		~Scene();
 
 		std::string name;
@@ -25,10 +25,10 @@ namespace slam {
 
 
 		// Internal methods TODO: make private and make Engine a friend class
-		void _render() const;
+		void _render();
 		void _enter() const;
 		void _draw() const;
-		void _update(float dt) const;
+		void _update(float dt);
 		void _setEngine(Engine* eng) { m_engine = eng; }
 
 		Entity CreateEntity(const std::string &name);
@@ -73,6 +73,6 @@ namespace slam {
 		RenderTexture m_renderTexture;
 
 		void _render3D() const;
-		void _render2D() const;
+		void _render2D();
 	};
 }

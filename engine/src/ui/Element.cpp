@@ -108,7 +108,7 @@ namespace slam::ui {
       }
     }
 
-    if (finalStyle.visible)
+    if (finalStyle.visible && this->id != "canvas")
       Draw(finalStyle, offset);
     for (const auto &child: children) {
       child->_draw(offset + finalStyle.position);
