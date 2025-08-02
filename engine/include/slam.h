@@ -15,8 +15,10 @@
 
 // Project dependencies
 #include "Camera.h"
+#include "ECS.h"
+#include "Engine.h"
 #include "Entity.h"
 #include "Scene.h"
-#include "Engine.h"
-#include "ECS.h"
 #include "Script.h"
+#include "io/parse/FileParser.h"
+#include "io/parse/StyleSheetParser.h"

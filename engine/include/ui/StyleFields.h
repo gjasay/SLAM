@@ -14,7 +14,7 @@
   STYLE_FIELD(float, borderRadius, 0.0f)                                                                               \
   STYLE_FIELD(bool, flex, false)                                                                                       \
   STYLE_FIELD(int, flexGap, 0)                                                                                         \
-  STYLE_FIELD(FlexDirection, flexDirection, FlexDirection::Row)                                                        \
-  STYLE_FIELD(JustifyContent, justifyContent, JustifyContent::FlexStart)                                               \
-  STYLE_FIELD(AlignItems, alignItems, AlignItems::FlexStart)                                                           \
-  STYLE_FIELD(bool, visible, true)
+  STYLE_FIELD(ui::FlexDirection, flexDirection, FlexDirection::Row)                                                    \
+  STYLE_FIELD(ui::JustifyContent, justifyContent, JustifyContent::FlexStart)                                          \
+  STYLE_FIELD(ui::AlignItems, alignItems, AlignItems::FlexStart)                                                      \
+  STYLE_FIELD(bool, visible, true);

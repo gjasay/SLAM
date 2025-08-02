@@ -46,6 +46,4 @@ namespace slam::ui {
 
     return out;
   }
-
-
 }

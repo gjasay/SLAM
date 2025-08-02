@@ -33,10 +33,13 @@ add_library(engine STATIC
     engine/src/Scene.cpp
     engine/src/Script.cpp
     engine/src/ui/Canvas.cpp
-        engine/src/ui/Element.cpp
-        engine/include/ui/Style.h
-        engine/src/ui/Style.cpp
-        engine/include/ui/StyleFields.h
+    engine/src/ui/Element.cpp
+    engine/src/ui/Style.cpp
+    engine/src/io/parse/StyleSheetParser.cpp
+    engine/include/ui/Style.h
+    engine/include/ui/StyleFields.h
+        engine/include/io/FileSystem.h
+        engine/src/io/FileSystem.cpp
 )
 
 target_include_directories(engine PUBLIC

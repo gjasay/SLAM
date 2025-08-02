@@ -1,5 +1,7 @@
-#include "slam.h"
 #include <memory>
+#include "slam.h"
+
+#include "io/FileSystem.h"
 
 class MyScript final : public slam::Script {
 public:
@@ -8,6 +10,7 @@ public:
 
     void Awake() override {
         transform = scene->GetComponent<slam::Transform>(*entity);
+        transform->Position = {3, 0, 0};
     }
 
     void Update(const float dt) override {
@@ -23,8 +26,10 @@ private:
 class MyPanel final : public slam::ui::Panel {
 };
 
-int main()
+int main(int argc, char* argv[])
 {
+    slam::io::FileSystem::Initialize(argv[0]);
+
     slam::Engine engine(800, 600, "SLAM Editor");
     auto scene = std::make_unique<slam::Scene>("MainScene");
     auto cube = scene->CreateEntity("");
@@ -33,25 +38,13 @@ int main()
     cubeRenderer->Mesh = LoadModelFromMesh(GenMeshCube(2, 2, 2));
     cubeRenderer->Color = {255, 0, 0, 255};
 
-    scene->canvas.styles.AddRule(".textStyle")
-        .color({255, 0, 0, 255})
-        .fontSize(20);
-
-    scene->canvas.styles.AddRule("#innerPanel")
-        .borderWidth(5)
-        .backgroundColor(::GRAY)
-        .borderColor({0, 0, 0, 255})
-        .flexDirection(slam::ui::FlexDirection::Row)
-        .justifyContent(slam::ui::JustifyContent::SpaceBetween)
-        .alignItems(slam::ui::AlignItems::Center)
-        .borderRadius(1.0f)
-        .flex(true);
-
-    scene->canvas.styles.AddRule("#outerPanel")
-        .visible(false);
+    // Load styles from .sss file
+    slam::io::StyleSheetParser styleParser(scene->canvas.styles);
+    styleParser.Parse(slam::io::FileSystem::GetResourcePath("styles.sss"));
 
     const auto outerPanel = scene->canvas.AddElement(std::make_unique<slam::ui::Element>(Vector2{0, 0}, 800, 600));
     const auto innerPanel = outerPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200));
+    outerPanel->AddChild(std::make_unique<slam::ui::Panel>(Vector2{50, 20}, 200, 200))->classes.emplace_back("innerStyle");
     outerPanel->id = "outerPanel";
     innerPanel->id = "innerPanel";
     innerPanel->AddChild(std::make_unique<slam::ui::Text>("one", Vector2{0, 0}))->classes.emplace_back("textStyle");

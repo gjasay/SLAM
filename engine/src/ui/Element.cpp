@@ -40,6 +40,20 @@ namespace slam::ui {
           if (children.size() > 1)
             finalStyle.flexGap = remainingSpace / (children.size() - 1);
           break;
+        case JustifyContent::SpaceAround:
+          if (!children.empty()) {
+            float gap = remainingSpace / static_cast<float>(children.size());
+            finalStyle.flexGap = static_cast<int>(gap);
+            mainAxisOffset += gap * 0.5f;
+          }
+          break;
+        case JustifyContent::SpaceEvenly:
+          if (!children.empty()) {
+            float gap = remainingSpace / static_cast<float>(children.size() + 1);
+            finalStyle.flexGap = static_cast<int>(gap);
+            mainAxisOffset += gap;
+          }
+          break;
         default:
           break;
       }
@@ -62,6 +76,9 @@ namespace slam::ui {
             case AlignItems::FlexEnd:
               crossAxisOffset += extra;
               break;
+            case AlignItems::Baseline:
+              /* align to flex-start baseline (default) */
+              break;
             default:
               break;
           }
@@ -75,6 +92,9 @@ namespace slam::ui {
               break;
             case AlignItems::FlexEnd:
               crossAxisOffset += extra;
+              break;
+            case AlignItems::Baseline:
+              /* align to flex-start baseline (default) */
               break;
             default:
               break;
@@ -99,9 +119,10 @@ namespace slam::ui {
     const Rectangle rect = {style.position.x + offset.x, style.position.y + offset.y, static_cast<float>(style.width),
                             static_cast<float>(style.height)};
     if (style.borderRadius > 0.0f) {
-      DrawRectangleRounded(rect, style.borderRadius, 0, style.backgroundColor);
+      constexpr int segments = 16;
+      DrawRectangleRounded(rect, style.borderRadius, segments, style.backgroundColor);
       if (style.borderWidth > 0)
-        DrawRectangleRoundedLines(rect, style.borderRadius, style.borderWidth, style.borderColor);
+        DrawRectangleRoundedLinesEx(rect, style.borderRadius, segments, style.borderWidth, style.borderColor);
     } else {
       DrawRectangleRec(rect, style.backgroundColor);
       if (style.borderWidth > 0)

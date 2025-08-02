@@ -1,10 +1,8 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-
 #include "StyleFields.h"
 #include "Vector.h"
-#include "raylib.h"
 
 namespace slam::ui {
   class Element;
@@ -15,12 +13,15 @@ namespace slam::ui {
     FlexEnd,
     Center,
     SpaceBetween,
+    SpaceAround,
+    SpaceEvenly,
   };
   enum class AlignItems {
     FlexStart,
     FlexEnd,
     Center,
     Stretch,
+    Baseline,
   };
 
   struct Style {
@@ -43,7 +44,17 @@ namespace slam::ui {
       STYLE_PROPERTIES
 #undef STYLE_FIELD
 
-      ~RuleBuilder() { manager.rules[selector] = style; }
+      ~RuleBuilder() {
+        auto &rules = manager.rules;
+
+        if (const auto it = rules.find(selector); it != rules.end()) {
+          Style merged = it->second;
+          StyleManager::merge(merged, style);
+          rules[selector] = merged;
+        } else {
+          rules[selector] = style;
+        }
+      }
 
     private:
       StyleManager &manager;
@@ -65,4 +76,4 @@ namespace slam::ui {
     static void merge(Style &base, const Style &add);
     static void mergeInline(Style &base, const Style &inlineStyle);
   };
-}
+} // namespace slam::ui
