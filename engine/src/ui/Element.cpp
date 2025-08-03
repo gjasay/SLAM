@@ -63,7 +63,7 @@ namespace slam::ui {
     for (const auto &child: children) {
       Style childStyle = canvas->styles.Resolve(child.get());
       if (auto textChild = dynamic_cast<Text *>(child.get())) {
-        const auto size = MeasureTextEx(::GetFontDefault(), textChild->GetText().c_str(), childStyle.fontSize, 1.0f);
+        const auto size = MeasureTextEx(::GetFontDefault(), textChild->InnerText.c_str(), childStyle.fontSize, 1.0f);
         childStyle.width = static_cast<int>(size.x);
         childStyle.height = static_cast<int>(size.y);
       }
@@ -112,7 +112,7 @@ namespace slam::ui {
     for (auto &child: children) {
       Style childStyle = canvas->styles.Resolve(child.get());
       if (auto textChild = dynamic_cast<Text *>(child.get())) {
-        const auto size = MeasureTextEx(::GetFontDefault(), textChild->GetText().c_str(), childStyle.fontSize, 1.0f);
+        const auto size = MeasureTextEx(::GetFontDefault(), textChild->InnerText.c_str(), childStyle.fontSize, 1.0f);
         childStyle.width = static_cast<int>(size.x);
         childStyle.height = static_cast<int>(size.y);
       }

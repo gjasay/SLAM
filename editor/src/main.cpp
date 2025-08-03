@@ -46,18 +46,26 @@ int main(int argc, char *argv[]) {
 
   slam::Engine engine(1600, 900, "SLAM Editor");
   auto scene = std::make_unique<slam::Scene>("MainScene", 1600, 900);
-  auto cube = scene->CreateEntity("");
-  const auto cubeRenderer = scene->AddComponent<slam::MeshRenderer>(cube);
-  scene->AddComponent<MyScript>(cube);
-  cubeRenderer->Mesh = LoadModelFromMesh(GenMeshCube(2, 2, 2));
-  cubeRenderer->Color = {255, 0, 0, 255};
 
   // Load styles from .sss file
   slam::io::StyleSheetParser styleParser(scene->canvas.styles);
   styleParser.Parse(slam::io::FileSystem::GetResourcePath("styles.sss"));
 
-  scene->canvas.AddElement(std::make_unique<slam::ui::Slider>())->AddClass("sliderStyle");
-  scene->canvas.AddElement(std::make_unique<MyPanel>());
+  auto* slider = dynamic_cast<slam::ui::Slider*>(scene->canvas.AddElement(std::make_unique<slam::ui::Slider>()));
+  auto* button = dynamic_cast<slam::ui::Button*>(scene->canvas.AddElement(std::make_unique<slam::ui::Button>()));
+  auto* text = dynamic_cast<slam::ui::Text*>(scene->canvas.AddElement(std::make_unique<slam::ui::Text>("0")));
+  slider->AddClass("sliderStyle");
+  button->AddClass("buttonStyle");
+
+  text->AddClass("textStyle");
+
+  slider->OnValueChange = [text](float value) {
+    text->InnerText = std::to_string(value);
+  };
+
+  button->OnClick = []() {
+    std::printf("clicked!");
+  };
 
   engine.SetScene(std::move(scene));
   engine.Run();

@@ -5,7 +5,6 @@
 
 namespace slam::ui {
   void Slider::OnCreate() {
-    const auto finalStyle = this->canvas->styles.Resolve(this);
     handle = dynamic_cast<Panel *>(this->AddChild(std::make_unique<Panel>()));
     handle->defaultStyle->position.x = 0;
     handle->defaultStyle->widthIsPercent = true;
@@ -45,11 +44,9 @@ void Slider::OnUpdate(float dt) {
 
     if (IsDragging) {
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            // Account for handle width in bounds checking
             float minBound = finalStyle.position.x + (handleStyle.width / 2);
             float maxBound = finalStyle.position.x + finalStyle.width - (handleStyle.width / 2);
 
-            // Only update if mouse is within adjusted bounds
             if (mousePos.x >= minBound && mousePos.x <= maxBound) {
                 SetValue(calculateValueFromPosition(mousePos));
             }
@@ -83,10 +80,8 @@ void Slider::OnUpdate(float dt) {
     const auto sliderStyle = this->GetStyle();
     const auto handleStyle = handle->GetStyle();
 
-    // Calculate relative position, keeping handle centered on mouse
     float relativeX = mousePos.x - sliderStyle.position.x - (handleStyle.width / 2);
 
-    // Calculate percentage using available width
     float availableWidth = sliderStyle.width - handleStyle.width;
     float percentage = relativeX / availableWidth;
     percentage = std::clamp(percentage, 0.0f, 1.0f);
