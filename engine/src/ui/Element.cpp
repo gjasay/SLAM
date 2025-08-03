@@ -8,18 +8,18 @@ namespace slam::ui {
 
 
   void Element::_draw(const Vector2 offset) {
-    Style finalStyle = canvas->styles.Resolve(this);
+    this->resolvedStyle = canvas->styles.Resolve(this);
 
-    resolvePercentSizes(finalStyle);
+    resolvePercentSizes(resolvedStyle);
 
-    if (finalStyle.flex && !children.empty()) {
-      applyFlexLayout(finalStyle);
+    if (resolvedStyle.flex && !children.empty()) {
+      applyFlexLayout(resolvedStyle);
     }
 
-    renderElements(finalStyle, offset);
+    renderElements(resolvedStyle, offset);
   }
 
-  void Element::resolvePercentSizes(Style &finalStyle) {
+  void Element::resolvePercentSizes(const Style &finalStyle) const {
     auto resolvePercent = [](Style &style, Element *elem, int parentW, int parentH) {
       if (style.widthIsPercent) {
         style.width = static_cast<int>(parentW * style.widthPercent);

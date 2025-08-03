@@ -1,5 +1,6 @@
 #include "ui/Canvas.h"
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 namespace slam::ui {
@@ -42,4 +43,20 @@ namespace slam::ui {
 
     _draw();
   }
+
+ void Canvas::Update(const float dt) {
+    OnUpdate(dt);
+
+    std::function<void(Element *)> updateRecursive = [&](Element* element) {
+        element->OnUpdate(dt);
+
+        for (const auto& child : element->children) {
+            updateRecursive(child.get());
+        }
+    };
+
+    for (const auto& child : children) {
+        updateRecursive(child.get());
+    }
+}
 }

@@ -30,6 +30,9 @@ namespace slam::ui {
       return out;
     }
 
+    if (e->defaultStyle)
+      merge(out, *e->defaultStyle);
+
     auto tagIt = rules.find(typeid(*e).name());
     if (tagIt != rules.end())
       merge(out, tagIt->second);

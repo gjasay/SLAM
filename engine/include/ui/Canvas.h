@@ -15,6 +15,7 @@ namespace slam::ui {
     void RemoveElement(Element *element);
     void Draw(Style style = Style(), Vector2 offset = {0,0}) override;
     void SetSize(int width, int height) const;
+    void Update(float dt);
   };
 
 }; // namespace slam::ui

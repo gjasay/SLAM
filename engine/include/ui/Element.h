@@ -18,9 +18,14 @@ namespace slam::ui {
 
     Canvas *canvas = nullptr;
 
+    std::unique_ptr<Style> defaultStyle = std::make_unique<Style>();
     std::unique_ptr<Style> inlineStyle = std::make_unique<Style>();
 
+    [[nodiscard]] Style GetStyle() const { return resolvedStyle; }
+
     virtual void OnCreate() {}
+    virtual void OnUpdate(float dt) {}
+    virtual void OnDestroy() {}
 
     Element* AddChild(std::unique_ptr<Element> child) {
       child->canvas = canvas;
@@ -54,12 +59,13 @@ namespace slam::ui {
 
   private:
     void _draw(Vector2 offset = {0, 0});
-    void resolvePercentSizes(Style& finalStyle);
+    void resolvePercentSizes(const Style & finalStyle) const;
     void applyFlexLayout(Style& finalStyle);
     void calculateFlexMeasurements(Style& finalStyle, bool isRow, int& totalChildSize, int& containerSize, int& remainingSpace);
     void calculateFlexOffsets(Style& finalStyle, int remainingSpace, float& mainAxisOffset);
     void layoutFlexChildren(Style& finalStyle, bool isRow, float mainAxisOffset);
     void renderElements(const Style& finalStyle, const Vector2& offset);
+    Style resolvedStyle = Style();
 
     friend class Canvas;
   };

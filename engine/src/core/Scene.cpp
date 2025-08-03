@@ -40,6 +40,8 @@ namespace slam
       canvas.SetSize(GetScreenWidth(), GetScreenHeight());
     }
 
+	  canvas.Update(dt);
+
 		const auto scriptComponents = _ecs.GetAllComponents<ScriptComponent>();
 
 		for (const auto* scriptComponent : scriptComponents) {

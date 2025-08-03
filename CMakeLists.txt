@@ -43,6 +43,9 @@ add_library(engine STATIC
         engine/src/io/FileSystem.cpp
         engine/include/ui/BasicElements.h
         engine/src/ui/BasicElements.cpp
+        engine/src/ui/Slider.cpp
+        engine/include/ui/Slider.h
+        engine/include/ui/UIElements.h
 )
 
 target_include_directories(engine PUBLIC
