@@ -47,7 +47,6 @@ ehthumbs.db
 *.orig
 
 # --- Crash dumps / core dumps ---
-core
 *.stackdump
 
 # --- Other ---
