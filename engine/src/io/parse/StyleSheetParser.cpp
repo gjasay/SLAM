@@ -1,3 +1,4 @@
+
 #include "../../../include/io/parse/StyleSheetParser.h"
 #include <algorithm>
 #include <cctype>
@@ -6,6 +7,38 @@
 #include <vector>
 
 namespace slam::io {
+  struct ParsedSize {
+    bool isPercent = false;
+    float value = 0.0f;
+  };
+
+static ParsedSize ParseSize(const std::string& value) {
+    std::string v = value;
+    v.erase(0, v.find_first_not_of(" \t"));
+    v.erase(v.find_last_not_of(" \t") + 1);
+    ParsedSize result;
+    // Remove px if present
+    if (v.size() > 2 && v.substr(v.size() - 2) == "px") {
+        v = v.substr(0, v.size() - 2);
+        v.erase(v.find_last_not_of(" \t") + 1);
+    }
+    // Handle percent, possibly with space (e.g. '100 %')
+    size_t percentPos = v.find('%');
+    if (percentPos != std::string::npos) {
+        std::string num = v.substr(0, percentPos);
+        num.erase(num.find_last_not_of(" \t") + 1);
+        try {
+            result.value = std::stof(num) / 100.0f;
+            result.isPercent = true;
+        } catch (...) { throw ParseError("Invalid percent size: " + v); }
+    } else {
+        try {
+            result.value = std::stof(v);
+            result.isPercent = false;
+        } catch (...) { throw ParseError("Invalid size: " + v); }
+    }
+    return result;
+}
 
   void StyleSheetParser::Parse(const std::string &filePath) {
     std::ifstream file(filePath);
@@ -79,11 +112,23 @@ namespace slam::io {
     auto [property, value] = SplitProperty(line);
     auto builder = _styleManager.AddRule(selector);
 
+  if (property == "width") {
+    auto sz = ParseSize(value);
+    builder.widthIsPercent(sz.isPercent);
+    if (sz.isPercent) builder.widthPercent(sz.value);
+    else builder.width(sz.value);
+  } else if (property == "height") {
+    auto sz = ParseSize(value);
+    builder.heightIsPercent(sz.isPercent);
+    if (sz.isPercent) builder.heightPercent(sz.value);
+    else builder.height(sz.value);
+  } else {
 #define STYLE_FIELD(type, name, ...)                                                                                   \
-  if (property == #name)                                                                                               \
-    builder.name(ParseValue<type>(value));
+    if (property == #name)                                                                                               \
+      builder.name(ParseValue<type>(value));
     STYLE_PROPERTIES
 #undef STYLE_FIELD
+  }
   }
 
   std::pair<std::string, std::string> StyleSheetParser::SplitProperty(const std::string &line) {

@@ -9,7 +9,7 @@ namespace slam::io {
   public:
     static void Initialize(const std::string &execPath) {
       executable_path = std::filesystem::path(execPath).parent_path();
-      project_root = executable_path.parent_path().parent_path() / "editor";
+      project_root = executable_path.parent_path().parent_path().parent_path() / "editor";
       resource_path = project_root / "assets";
     }
 

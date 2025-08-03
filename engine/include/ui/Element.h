@@ -11,8 +11,7 @@ namespace slam::ui {
   public:
     explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0) {
       inlineStyle->position = position;
-      inlineStyle->width = width;
-      inlineStyle->height = height;
+
     }
 
     virtual ~Element() {}

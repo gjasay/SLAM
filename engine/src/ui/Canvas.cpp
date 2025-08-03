@@ -7,7 +7,7 @@ namespace slam::ui {
     canvas = this;
     id = "canvas";
     SetSize(width, height);
-    inlineStyle->visible = true;
+    inlineStyle->visible = false;
   }
 
   void Canvas::SetSize(const int width, const int height) const {

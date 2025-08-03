@@ -8,6 +8,22 @@ namespace slam::ui {
   void Element::_draw(const Vector2 offset) {
     Style finalStyle = canvas->styles.Resolve(this);
 
+    // --- Handle percentage-based width/height for children ---
+    if (!children.empty()) {
+      for (const auto &child: children) {
+        Style childStyle = canvas->styles.Resolve(child.get());
+        // Resolve percent width/height
+        if (childStyle.widthIsPercent) {
+          childStyle.width = static_cast<int>(finalStyle.width * childStyle.widthPercent);
+          if (child->inlineStyle) child->inlineStyle->width = childStyle.width;
+        }
+        if (childStyle.heightIsPercent) {
+          childStyle.height = static_cast<int>(finalStyle.height * childStyle.heightPercent);
+          if (child->inlineStyle) child->inlineStyle->height = childStyle.height;
+        }
+      }
+    }
+
     if (finalStyle.flex && !children.empty()) {
       bool isRow = finalStyle.flexDirection == FlexDirection::Row;
       int totalChildSize = 0;
