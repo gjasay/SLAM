@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(SLAM VERSION 0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ------------------------
 # Add submodules include directories
@@ -27,11 +28,11 @@ file(GLOB_RECURSE ENGINE_SOURCES
 )
 
 add_library(engine STATIC
-    engine/src/Camera.cpp
-    engine/src/ECS.cpp
-    engine/src/Engine.cpp
-    engine/src/Scene.cpp
-    engine/src/Script.cpp
+        engine/src/core/Camera.cpp
+        engine/src/core/ECS.cpp
+        engine/src/core/Engine.cpp
+        engine/src/core/Scene.cpp
+        engine/src/core/Script.cpp
     engine/src/ui/Canvas.cpp
     engine/src/ui/Element.cpp
     engine/src/ui/Style.cpp
@@ -40,6 +41,8 @@ add_library(engine STATIC
     engine/include/ui/StyleFields.h
         engine/include/io/FileSystem.h
         engine/src/io/FileSystem.cpp
+        engine/include/ui/BasicElements.h
+        engine/src/ui/BasicElements.cpp
 )
 
 target_include_directories(engine PUBLIC

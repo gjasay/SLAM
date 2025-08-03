@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include "Style.h"
 #include "Vector.h"
 
@@ -9,12 +10,8 @@ namespace slam::ui {
 
   class Element {
   public:
-    explicit Element(const Vector2 position = {0, 0}, const int width = 0, const int height = 0) {
-      inlineStyle->position = position;
-
-    }
-
-    virtual ~Element() {}
+    Element() = default;
+    virtual ~Element() = default;
 
     std::string id;
     std::vector<std::string> classes;
@@ -23,10 +20,31 @@ namespace slam::ui {
 
     std::unique_ptr<Style> inlineStyle = std::make_unique<Style>();
 
+    virtual void OnCreate() {}
+
     Element* AddChild(std::unique_ptr<Element> child) {
       child->canvas = canvas;
       children.emplace_back(std::move(child));
+      children.back()->OnCreate();
       return children.back().get();
+    }
+
+    void RemoveChild(Element *child) {
+      children.erase(std::remove_if(children.begin(), children.end(),
+                                     [child](const std::unique_ptr<Element> &c) { return c.get() == child; }),
+                     children.end());
+    }
+
+    void RemoveChildren() {
+      children.clear();
+    }
+
+    void AddClass(const std::string &className) {
+        classes.emplace_back(className);
+    }
+
+    void RemoveClass(const std::string &className) {
+      classes.erase(std::remove(classes.begin(), classes.end(), className), classes.end());
     }
 
     virtual void Draw(Style style, Vector2 offset) {}
@@ -35,42 +53,20 @@ namespace slam::ui {
     std::vector<std::unique_ptr<Element>> children;
 
   private:
-
     void _draw(Vector2 offset = {0, 0});
+    void resolvePercentSizes(Style& finalStyle);
+    void applyFlexLayout(Style& finalStyle);
+    void calculateFlexMeasurements(Style& finalStyle, bool isRow, int& totalChildSize, int& containerSize, int& remainingSpace);
+    void calculateFlexOffsets(Style& finalStyle, int remainingSpace, float& mainAxisOffset);
+    void layoutFlexChildren(Style& finalStyle, bool isRow, float mainAxisOffset);
+    void renderElements(const Style& finalStyle, const Vector2& offset);
 
     friend class Canvas;
   };
 
-  class Panel : public Element {
-  public:
-    Panel(const Vector2 position, const int width, const int height) : Element(position, width, height) {}
 
-    void Draw(Style style, Vector2 offset) override;
-  };
+  
 
-  /*
-  class Slider : public Panel {
-  public:
-    Slider(const Vector2 position, const int width, const int height) : Panel(position, width, height) {
-      this->AddChild(make_unique<Panel>(Vector2{0, 0}, width, height))->id = "sliderTrack";
-    }
-  };
-  */
 
-  class Button : public Element {
-    public:
-    Button(const Vector2 position, const int width, const int height) : Element(position, width, height) {}
 
-    void Draw(Style style, Vector2 offset) override;
-  };
-
-  class Text : public Element {
-  public:
-    Text(const std::string &text, const Vector2 position) : Element(position), _text(text) {}
-    void Draw(Style style, Vector2 offset) override;
-    const std::string& GetText() const { return _text; }
-
-  private:
-    std::string _text;
-  };
 }

@@ -21,4 +21,4 @@
   STYLE_FIELD(bool, widthIsPercent, false) \
   STYLE_FIELD(float, widthPercent, 0.0f) \
   STYLE_FIELD(bool, heightIsPercent, false) \
-  STYLE_FIELD(float, heightPercent, 0.0f) \
+  STYLE_FIELD(float, heightPercent, 0.0f)

@@ -1,12 +1,13 @@
 
 
 // Standard library dependencies
-#include <string>
-#include <memory>
-#include <vector>
-#include <unordered_map>
-#include <type_traits>
+#pragma once
 #include <iostream>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 // External dependencies
 #include <raylib.h>
@@ -14,11 +15,14 @@
 #include <raygui.h>
 
 // Project dependencies
-#include "Camera.h"
-#include "ECS.h"
-#include "Engine.h"
-#include "Entity.h"
-#include "Scene.h"
-#include "Script.h"
+#include "core/ECS.h"
+#include "core/Entity.h"
+#include "core/Script.h"
+#include "core/Camera.h"
+#include "core/Engine.h"
+#include "core/Scene.h"
+#include "ui/BasicElements.h"
+#include "ui/Canvas.h"
+#include "ui/Style.h"
 #include "io/parse/FileParser.h"
 #include "io/parse/StyleSheetParser.h"
