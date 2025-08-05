@@ -28,10 +28,6 @@ void Slider::OnUpdate(float dt) {
     const auto handleStyle = handle->GetStyle();
     const Vector2 mousePos = ::GetMousePosition();
 
-    Rectangle bounds{finalStyle.position.x, finalStyle.position.y, finalStyle.width, finalStyle.height};
-    bool isMouseOverSlider = CheckCollisionPointRec(mousePos, bounds);
-    IsHovered = isMouseOverSlider;
-
     if (IsHovered) {
         handle->defaultStyle->backgroundColor = hoverHandleColor;
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -44,8 +40,8 @@ void Slider::OnUpdate(float dt) {
 
     if (IsDragging) {
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            float minBound = finalStyle.position.x + (handleStyle.width / 2);
-            float maxBound = finalStyle.position.x + finalStyle.width - (handleStyle.width / 2);
+            float minBound = AbsPosition.x + (handleStyle.width / 2);
+            float maxBound = AbsPosition.x + finalStyle.width - (handleStyle.width / 2);
 
             if (mousePos.x >= minBound && mousePos.x <= maxBound) {
                 SetValue(calculateValueFromPosition(mousePos));
@@ -80,7 +76,7 @@ void Slider::OnUpdate(float dt) {
     const auto sliderStyle = this->GetStyle();
     const auto handleStyle = handle->GetStyle();
 
-    float relativeX = mousePos.x - sliderStyle.position.x - (handleStyle.width / 2);
+    float relativeX = mousePos.x - AbsPosition.x - (handleStyle.width / 2);
 
     float availableWidth = sliderStyle.width - handleStyle.width;
     float percentage = relativeX / availableWidth;

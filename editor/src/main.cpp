@@ -51,21 +51,32 @@ int main(int argc, char *argv[]) {
   slam::io::StyleSheetParser styleParser(scene->canvas.styles);
   styleParser.Parse(slam::io::FileSystem::GetResourcePath("styles.sss"));
 
-  auto* slider = dynamic_cast<slam::ui::Slider*>(scene->canvas.AddElement(std::make_unique<slam::ui::Slider>()));
-  auto* button = dynamic_cast<slam::ui::Button*>(scene->canvas.AddElement(std::make_unique<slam::ui::Button>()));
-  auto* text = dynamic_cast<slam::ui::Text*>(scene->canvas.AddElement(std::make_unique<slam::ui::Text>("0")));
-  slider->AddClass("sliderStyle");
-  button->AddClass("buttonStyle");
+  auto* sliderr = dynamic_cast<slam::ui::Slider*>(scene->canvas.AddElement(std::make_unique<slam::ui::Slider>()));
+  sliderr->AddClass("sliderStyle");
+  sliderr->id = "slideerrr";
 
-  text->AddClass("textStyle");
+  scene->canvas.AddElement(std::make_unique<slam::ui::Button>("Click Me"))->AddClass("buttonStyle");
 
-  slider->OnValueChange = [text](float value) {
-    text->InnerText = std::to_string(value);
-  };
-
-  button->OnClick = []() {
-    std::printf("clicked!");
-  };
+  for (int i = 0; i < 5; i++) {
+    auto* container = scene->canvas.AddElement(std::make_unique<slam::ui::Element>());
+    container->id = "container" + std::to_string(i);
+    auto* slider = dynamic_cast<slam::ui::Slider*>(container->AddChild(std::make_unique<slam::ui::Slider>()));
+    auto* text = dynamic_cast<slam::ui::Text*>(container->AddChild(std::make_unique<slam::ui::Text>("0")));
+    container->inlineStyle->flex = true;
+    container->inlineStyle->flexDirection = slam::ui::FlexDirection::Row;
+    container->inlineStyle->justifyContent = slam::ui::JustifyContent::SpaceBetween;
+    container->inlineStyle->alignItems = slam::ui::AlignItems::Center;
+    container->inlineStyle->widthIsPercent = true;
+    container->inlineStyle->widthPercent = 0.75f;
+    container->AddClass("container");
+    slider->AddClass("sliderStyle");
+    slider->id = "slider" + std::to_string(i);
+    text->AddClass("textStyle");
+    text->id = "text" + std::to_string(i);
+    slider->OnValueChange = [text](float value) {
+      text->InnerText = std::to_string(static_cast<int>(value * 100));
+    };
+  }
 
   engine.SetScene(std::move(scene));
   engine.Run();

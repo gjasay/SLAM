@@ -1,9 +1,9 @@
-
 #include "../../../include/io/parse/StyleSheetParser.h"
 #include <algorithm>
 #include <cctype>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 namespace slam::io {
@@ -12,33 +12,35 @@ namespace slam::io {
     float value = 0.0f;
   };
 
-static ParsedSize ParseSize(const std::string& value) {
+  static ParsedSize ParseSize(const std::string &value) {
     std::string v = value;
     v.erase(0, v.find_first_not_of(" \t"));
     v.erase(v.find_last_not_of(" \t") + 1);
     ParsedSize result;
-    // Remove px if present
     if (v.size() > 2 && v.substr(v.size() - 2) == "px") {
-        v = v.substr(0, v.size() - 2);
-        v.erase(v.find_last_not_of(" \t") + 1);
+      v = v.substr(0, v.size() - 2);
+      v.erase(v.find_last_not_of(" \t") + 1);
     }
-    // Handle percent, possibly with space (e.g. '100 %')
     size_t percentPos = v.find('%');
     if (percentPos != std::string::npos) {
-        std::string num = v.substr(0, percentPos);
-        num.erase(num.find_last_not_of(" \t") + 1);
-        try {
-            result.value = std::stof(num) / 100.0f;
-            result.isPercent = true;
-        } catch (...) { throw ParseError("Invalid percent size: " + v); }
+      std::string num = v.substr(0, percentPos);
+      num.erase(num.find_last_not_of(" \t") + 1);
+      try {
+        result.value = std::stof(num) / 100.0f;
+        result.isPercent = true;
+      } catch (...) {
+        throw ParseError("Invalid percent size: " + v);
+      }
     } else {
-        try {
-            result.value = std::stof(v);
-            result.isPercent = false;
-        } catch (...) { throw ParseError("Invalid size: " + v); }
+      try {
+        result.value = std::stof(v);
+        result.isPercent = false;
+      } catch (...) {
+        throw ParseError("Invalid size: " + v);
+      }
     }
     return result;
-}
+  }
 
   void StyleSheetParser::Parse(const std::string &filePath) {
     std::ifstream file(filePath);
@@ -48,33 +50,57 @@ static ParsedSize ParseSize(const std::string& value) {
 
     std::string line;
     std::string currentSelector;
+    ui::StyleState currentState = ui::StyleState::Default;
 
     while (std::getline(file, line)) {
-      // Trim whitespace from both ends
       line.erase(0, line.find_first_not_of(" \t\r\n"));
       line.erase(line.find_last_not_of(" \t\r\n") + 1);
 
-      // Skip empty lines and comments
       if (line.empty() || line[0] == '/')
         continue;
 
-      // Start of a selector block
       if (line.back() == '{') {
-        currentSelector = line.substr(0, line.length() - 1);
-        currentSelector.erase(currentSelector.find_last_not_of(" \t") + 1);
+        std::string selector = line.substr(0, line.length() - 1);
+        selector.erase(selector.find_last_not_of(" \t") + 1);
+
+        currentState = ui::StyleState::Default;
+        size_t pseudoPos = selector.find(':');
+
+        if (pseudoPos != std::string::npos) {
+          std::string baseSelector = selector.substr(0, pseudoPos);
+          std::string pseudoSelector = selector.substr(pseudoPos + 1);
+
+          baseSelector.erase(baseSelector.find_last_not_of(" \t") + 1);
+          pseudoSelector.erase(0, pseudoSelector.find_first_not_of(" \t"));
+
+          if (pseudoSelector == "hover")
+            currentState = ui::StyleState::Hover;
+          else if (pseudoSelector == "active")
+            currentState = ui::StyleState::Active;
+          else if (pseudoSelector == "focus")
+            currentState = ui::StyleState::Focus;
+          else if (pseudoSelector == "disabled")
+            currentState = ui::StyleState::Disabled;
+          else
+            throw ParseError("Unknown pseudo-selector: " + pseudoSelector);
+
+          currentSelector = baseSelector;
+        } else {
+          currentSelector = selector;
+        }
       }
-      // End of a selector block
+
       else if (line[0] == '}') {
         currentSelector.clear();
+        currentState = ui::StyleState::Default;
       }
-      // Property line inside a selector block
+
       else if (!currentSelector.empty()) {
-        ParseProperty(currentSelector, line);
+        ParseProperty(currentSelector, line, currentState);
       }
     }
   }
 
-  // Template specializations for parsing different types
   template<>
   int StyleSheetParser::ParseValue<int>(const std::string &value) {
     return ParseInt(value);
@@ -108,27 +134,31 @@ static ParsedSize ParseSize(const std::string& value) {
     return ParseAlignItems(value);
   }
 
-  void StyleSheetParser::ParseProperty(const std::string &selector, const std::string &line) {
+  void StyleSheetParser::ParseProperty(const std::string &selector, const std::string &line, ui::StyleState state) {
     auto [property, value] = SplitProperty(line);
-    auto builder = _styleManager.AddRule(selector);
+    auto builder = _styleManager.AddRule(selector, state);
 
-  if (property == "width") {
-    auto sz = ParseSize(value);
-    builder.widthIsPercent(sz.isPercent);
-    if (sz.isPercent) builder.widthPercent(sz.value);
-    else builder.width(sz.value);
-  } else if (property == "height") {
-    auto sz = ParseSize(value);
-    builder.heightIsPercent(sz.isPercent);
-    if (sz.isPercent) builder.heightPercent(sz.value);
-    else builder.height(sz.value);
-  } else {
+    if (property == "width") {
+      auto sz = ParseSize(value);
+      builder.widthIsPercent(sz.isPercent);
+      if (sz.isPercent)
+        builder.widthPercent(sz.value);
+      else
+        builder.width(sz.value);
+    } else if (property == "height") {
+      auto sz = ParseSize(value);
+      builder.heightIsPercent(sz.isPercent);
+      if (sz.isPercent)
+        builder.heightPercent(sz.value);
+      else
+        builder.height(sz.value);
+    } else {
 #define STYLE_FIELD(type, name, ...)                                                                                   \
-    if (property == #name)                                                                                               \
-      builder.name(ParseValue<type>(value));
-    STYLE_PROPERTIES
+  if (property == #name)                                                                                               \
+    builder.name(ParseValue<type>(value));
+      STYLE_PROPERTIES
 #undef STYLE_FIELD
-  }
+    }
   }
 
   std::pair<std::string, std::string> StyleSheetParser::SplitProperty(const std::string &line) {
@@ -140,11 +170,9 @@ static ParsedSize ParseSize(const std::string& value) {
     std::string property = line.substr(0, colonPos);
     std::string value = line.substr(colonPos + 1);
 
-    // Trim leading/trailing whitespace from property
     property.erase(0, property.find_first_not_of(" \t"));
     property.erase(property.find_last_not_of(" \t") + 1);
 
-    // Trim leading whitespace and trailing whitespace/semicolons from value
     value.erase(0, value.find_first_not_of(" \t"));
     auto lastChar = value.find_last_not_of(" \t\r\n;");
     if (lastChar != std::string::npos) {
@@ -157,14 +185,15 @@ static ParsedSize ParseSize(const std::string& value) {
 
   // Parser implementations
   Color StyleSheetParser::ParseColor(const std::string &value) {
-    if (value == "WHITE")
-      return ::WHITE;
-    if (value == "BLACK")
-      return ::BLACK;
-    if (value == "GRAY")
-      return ::GRAY;
-    if (value == "RED")
-      return ::RED;
+    static const std::unordered_map<std::string, Color> colorMap = {
+        {"WHITE", ::WHITE},       {"BLACK", ::BLACK},     {"GRAY", ::GRAY},
+        {"RED", ::RED},           {"YELLOW", ::YELLOW},   {"GREEN", ::GREEN},
+        {"BLUE", ::BLUE},         {"MAGENTA", ::MAGENTA}, {"LIGHTGRAY", ::LIGHTGRAY},
+        {"DARKGRAY", ::DARKGRAY}, {"ORANGE", ::ORANGE},   {"PURPLE", ::PURPLE},
+        {"PINK", ::PINK},         {"BROWN", ::BROWN},     {"TRANSPARENT", {0, 0, 0, 0}}};
+    auto it = colorMap.find(value);
+    if (it != colorMap.end())
+      return it->second;
 
     std::vector<int> components;
     std::stringstream ss(value);

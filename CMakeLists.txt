@@ -36,6 +36,7 @@ add_library(engine STATIC
     engine/src/ui/Canvas.cpp
     engine/src/ui/Element.cpp
     engine/src/ui/Style.cpp
+        engine/src/ui/StyleManager.cpp
     engine/src/io/parse/StyleSheetParser.cpp
     engine/include/ui/Style.h
     engine/include/ui/StyleFields.h

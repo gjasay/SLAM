@@ -1,62 +1,13 @@
-#include "ui/Canvas.h"
-#include <algorithm>
-#include <functional>
-#include <iostream>
+#include "../../include/ui/Canvas.h"
+#include "raylib.h"
 
 namespace slam::ui {
-  Canvas::Canvas(const int width, const int height) {
-    canvas = this;
-    id = "canvas";
-    SetSize(width, height);
-    inlineStyle->visible = false;
+  void Canvas::Draw() { root->_draw({0, 0}); }
+
+  void Canvas::Update(float dt) {
+    root->_update(dt);
   }
 
-  void Canvas::SetSize(const int width, const int height) const {
-    inlineStyle->width = width;
-    inlineStyle->height = height;
-  }
+  Element *Canvas::AddElement(std::unique_ptr<Element> element) { return root->AddChild(std::move(element)); }
 
-  Element* Canvas::AddElement(std::unique_ptr<Element> element) {
-    element->canvas = this;
-    AddChild(std::move(element));
-    return children.back().get();
-  }
-
-  void Canvas::RemoveElement(Element* element) {
-    const auto it = std::remove_if(children.begin(), children.end(),
-      [element](const std::unique_ptr<Element>& ptr) {
-        return ptr.get() == element;
-      });
-    children.erase(it, children.end());
-  }
-
-  void Canvas::Draw(Style style, Vector2 offset) {
-    if (!inlineStyle) {
-      std::cerr << "Canvas has no inline style!" << std::endl;
-      return;
-    }
-    const Style finalStyle = styles.Resolve(this);
-
-    if (finalStyle.visible) {
-      DrawRectangle(finalStyle.position.x, finalStyle.position.y, finalStyle.width, finalStyle.height, finalStyle.backgroundColor);
-    }
-
-    _draw();
-  }
-
- void Canvas::Update(const float dt) {
-    OnUpdate(dt);
-
-    std::function<void(Element *)> updateRecursive = [&](Element* element) {
-        element->OnUpdate(dt);
-
-        for (const auto& child : element->children) {
-            updateRecursive(child.get());
-        }
-    };
-
-    for (const auto& child : children) {
-        updateRecursive(child.get());
-    }
-}
-}
+} // namespace slam::ui

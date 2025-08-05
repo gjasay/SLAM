@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../ui/Style.h"
+#include "../../ui/StyleManager.h"
 #include "FileParser.h"
 
 namespace slam::io {
@@ -25,7 +25,7 @@ namespace slam::io {
 
   private:
     ui::StyleManager &_styleManager;
-    void ParseProperty(const std::string &selector, const std::string &line);
+    void ParseProperty(const std::string &selector, const std::string &line, ui::StyleState state = ui::StyleState::Default);
     static std::pair<std::string, std::string> SplitProperty(const std::string &line);
   };
 

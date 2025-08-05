@@ -16,7 +16,6 @@ class Slider : public Panel {
     void SetRange(float min, float max);
 
     std::function<void(float)> OnValueChange;
-    bool IsHovered = false;
     bool IsDragging = false;
 
   private:

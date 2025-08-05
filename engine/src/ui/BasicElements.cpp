@@ -18,20 +18,26 @@ namespace slam::ui {
   }
 
   void Button::OnUpdate(float dt) {
-    const auto finalStyle = this->GetStyle();
-    const auto mousePos = ::GetMousePosition();
-    Rectangle bounds{finalStyle.position.x, finalStyle.position.y, finalStyle.width, finalStyle.height};
-    bool isMouseOverButton = CheckCollisionPointRec(mousePos, bounds);
-    IsHovered = isMouseOverButton;
-
-    if (isMouseOverButton && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-      IsPressed = true;
-      if (OnClick) OnClick();
-    } else {
-      IsPressed = false;
+    if (IsActive && IsFocused && OnClick) {
+        OnClick();
     }
   }
 
+  void Button::Draw(const Style style, const Vector2 offset) {
+    const Rectangle rect = {style.position.x + offset.x, style.position.y + offset.y, static_cast<float>(style.width),
+                            static_cast<float>(style.height)};
+
+    DrawRectangleRec(rect, style.backgroundColor);
+    if (style.borderWidth > 0) {
+      DrawRectangleLinesEx(rect, style.borderWidth, style.borderColor);
+    }
+
+    if (!InnerText.empty()) {
+      const auto textSize = MeasureTextEx(::GetFontDefault(), InnerText.c_str(), style.fontSize, 1.0f);
+      Vector2 textPos = {rect.x + (rect.width - textSize.x) / 2, rect.y + (rect.height - textSize.y) / 2};
+      DrawTextEx(::GetFontDefault(), InnerText.c_str(), textPos, style.fontSize, 1.0f, style.color);
+    }
+  }
 
   void Text::Draw(Style style, const Vector2 offset) {
     const auto size = MeasureTextEx(::GetFontDefault(), InnerText.c_str(), style.fontSize, 1.0f);
@@ -42,4 +48,4 @@ namespace slam::ui {
       DrawRectangleLines(style.position.x + offset.x, style.position.y + offset.y, style.width, style.height,
                          style.borderColor);
   }
-}
+} // namespace slam::ui

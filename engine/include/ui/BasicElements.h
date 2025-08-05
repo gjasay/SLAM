@@ -15,12 +15,11 @@ namespace slam::ui {
   class Button : public Panel {
   public:
     Button() = default;
-
+    explicit Button(std::string text) : InnerText(std::move(text)) {}
     void OnUpdate(float dt) override;
-
+    void Draw(Style style, Vector2 offset) override;
     std::function<void()> OnClick;
-    bool IsHovered = false;
-    bool IsPressed = false;
+    std::string InnerText;
   };
 
   class Text : public Element {
