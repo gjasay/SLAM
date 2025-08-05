@@ -19,7 +19,7 @@ namespace slam::ui {
 
   void Button::OnUpdate(float dt) {
     if (IsActive && IsFocused && OnClick) {
-        OnClick();
+      OnClick();
     }
   }
 
@@ -48,4 +48,80 @@ namespace slam::ui {
       DrawRectangleLines(style.position.x + offset.x, style.position.y + offset.y, style.width, style.height,
                          style.borderColor);
   }
+
+  void TextInput::OnCreate() {
+    textElement = dynamic_cast<Text *>(this->AddChild(std::make_unique<Text>("")));
+
+    if (textElement) {
+      textElement->defaultStyle->fontSize = 20;
+      textElement->defaultStyle->color = ::BLACK;
+      textElement->defaultStyle->padding = 10;
+      textElement->defaultStyle->marginLeft = 10;
+    }
+    this->defaultStyle->borderColor = ::GRAY;
+    this->defaultStyle->borderWidth = 1;
+    this->defaultStyle->borderRadius = 0.1f;
+    this->defaultStyle->width = 200;
+    this->defaultStyle->height = 40;
+    this->defaultStyle->flex = true;
+    this->defaultStyle->justifyContent = JustifyContent::FlexStart;
+    this->defaultStyle->alignItems = AlignItems::Center;
+  }
+
+  void TextInput::OnUpdate(float dt) {
+    if (!IsFocused) {
+      return;
+    }
+    bool backspaceDown = ::IsKeyDown(::KEY_BACKSPACE);
+    if (backspaceDown) {
+      if (!backspaceHeld) {
+        // initial delete
+        if (!content.empty()) {
+          content.pop_back();
+          if (OnTextChange)
+            OnTextChange(content);
+        }
+        backspaceHeld = true;
+        backspaceTimer = 0.0f;
+      } else {
+        backspaceTimer += dt;
+        if (backspaceTimer >= backspaceRepeatRate) {
+          if (!content.empty()) {
+            content.pop_back();
+            if (OnTextChange)
+              OnTextChange(content);
+          }
+          backspaceTimer -= backspaceRepeatRate;
+        }
+      }
+    } else {
+      backspaceHeld = false;
+      backspaceTimer = 0.0f;
+    }
+    if (::IsKeyPressed(::KEY_ENTER) && !content.empty()) {
+      if (OnSubmit) {
+        OnSubmit();
+      }
+    }
+    const int key = ::GetCharPressed();
+    if (key > 0) {
+      content += static_cast<char>(key);
+      if (OnTextChange)
+        OnTextChange(content);
+    }
+    if (IsFocused) {
+      blinkTimer += dt;
+      if (blinkTimer >= blinkInterval) {
+        blinkVisible = !blinkVisible;
+        blinkTimer -= blinkInterval;
+      }
+    } else {
+      blinkVisible = false;
+      blinkTimer = 0.0f;
+    }
+    if (textElement) {
+      textElement->InnerText = content + (IsFocused && blinkVisible ? std::string("_") : std::string(""));
+    }
+  }
+
 } // namespace slam::ui

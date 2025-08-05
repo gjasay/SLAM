@@ -7,6 +7,11 @@
   STYLE_FIELD(int, zIndex, 0)                                                                                          \
   STYLE_FIELD(int, borderWidth, 0)                                                                                     \
   STYLE_FIELD(int, padding, 0)                                                                                         \
+  STYLE_FIELD(int, margin, 0)                                                                                          \
+  STYLE_FIELD(int, marginTop, 0)                                                                                       \
+  STYLE_FIELD(int, marginBottom, 0)                                                                                    \
+  STYLE_FIELD(int, marginLeft, 0)                                                                                      \
+  STYLE_FIELD(int, marginRight, 0)                                                                                     \
   STYLE_FIELD(Color, backgroundColor, {0, 0, 0, 0})                                                                    \
   STYLE_FIELD(Color, borderColor, {0, 0, 0, 0})                                                                        \
   STYLE_FIELD(Color, color, {0, 0, 0, 0})                                                                              \

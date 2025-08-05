@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <memory>
 #include <utility>
 
 #include "Element.h"
@@ -12,7 +13,7 @@ namespace slam::ui {
     void Draw(Style style, Vector2 offset) override;
   };
 
-  class Button : public Panel {
+  class Button : public Element {
   public:
     Button() = default;
     explicit Button(std::string text) : InnerText(std::move(text)) {}
@@ -27,9 +28,24 @@ namespace slam::ui {
     explicit Text(std::string text) : InnerText(std::move(text)) {}
     void Draw(Style style, Vector2 offset) override;
     std::string InnerText;
-
-  private:
   };
 
+  class TextInput : public Panel {
+  public:
+    TextInput() {}
+    void OnCreate() override;
+    void OnUpdate(float dt) override;
+    std::function<void(const std::string &)> OnTextChange;
+    std::function<void()> OnSubmit; // called when Enter is pressed
 
+  private:
+    Text* textElement = nullptr;
+    std::string content; // actual text content without cursor
+    float backspaceTimer = 0.0f;
+    bool backspaceHeld = false;
+    const float backspaceRepeatRate = 0.1f; // seconds between repeats
+    float blinkTimer = 0.0f;
+    bool blinkVisible = true;
+    const float blinkInterval = 0.5f; // seconds for blink on/off
+  };
 } // namespace slam::ui

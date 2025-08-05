@@ -9,6 +9,10 @@ namespace slam::ui {
   void Element::_draw(const Vector2 offset) {
     Style layoutStyle = canvas->styles.Resolve(this, StyleState::Default);
     resolvePercentSizes(layoutStyle);
+    int mLeft = layoutStyle.marginLeft > 0 ? layoutStyle.marginLeft : layoutStyle.margin;
+    int mTop = layoutStyle.marginTop > 0   ? layoutStyle.marginTop   : layoutStyle.margin;
+    layoutStyle.position.x += mLeft;
+    layoutStyle.position.y += mTop;
     if (layoutStyle.flex && !children.empty()) {
       applyFlexLayout(layoutStyle);
     }
@@ -33,6 +37,11 @@ namespace slam::ui {
     StyleState currentState = GetCurrentState();
     this->resolvedStyle = canvas->styles.Resolve(this, currentState);
     resolvePercentSizes(resolvedStyle);
+    // apply margins to resolved style
+    int rmLeft = resolvedStyle.marginLeft > 0 ? resolvedStyle.marginLeft : resolvedStyle.margin;
+    int rmTop = resolvedStyle.marginTop > 0   ? resolvedStyle.marginTop   : resolvedStyle.margin;
+    resolvedStyle.position.x += rmLeft;
+    resolvedStyle.position.y += rmTop;
 
     if (resolvedStyle.flex && !children.empty()) {
       applyFlexLayout(resolvedStyle);
