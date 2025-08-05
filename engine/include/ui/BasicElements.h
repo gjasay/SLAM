@@ -36,16 +36,16 @@ namespace slam::ui {
     void OnCreate() override;
     void OnUpdate(float dt) override;
     std::function<void(const std::string &)> OnTextChange;
-    std::function<void()> OnSubmit; // called when Enter is pressed
+    std::function<void()> OnSubmit;
 
   private:
     Text* textElement = nullptr;
-    std::string content; // actual text content without cursor
+    std::string content;
     float backspaceTimer = 0.0f;
     bool backspaceHeld = false;
-    const float backspaceRepeatRate = 0.1f; // seconds between repeats
+    const float backspaceRepeatRate = 0.1f;
     float blinkTimer = 0.0f;
     bool blinkVisible = true;
-    const float blinkInterval = 0.5f; // seconds for blink on/off
+    const float blinkInterval = 0.5f;
   };
 } // namespace slam::ui

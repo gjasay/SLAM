@@ -69,10 +69,16 @@ namespace slam::ui {
   }
 
   void TextInput::OnUpdate(float dt) {
+    if (IsHovered) {
+      SetMouseCursor(::MOUSE_CURSOR_IBEAM);
+    } else {
+      SetMouseCursor(::MOUSE_CURSOR_DEFAULT);
+    }
+
     if (!IsFocused) {
       return;
     }
-    bool backspaceDown = ::IsKeyDown(::KEY_BACKSPACE);
+    const bool backspaceDown = ::IsKeyDown(::KEY_BACKSPACE);
     if (backspaceDown) {
       if (!backspaceHeld) {
         // initial delete
