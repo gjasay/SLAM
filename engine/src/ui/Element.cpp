@@ -167,6 +167,11 @@ namespace slam::ui {
   void Element::layoutFlexChildren(Style &finalStyle, bool isRow, float mainAxisOffset) {
     for (auto &child: children) {
       Style childStyle = canvas->styles.Resolve(child.get());
+
+      if (childStyle.absolutePosition) {
+        continue;
+      }
+
       if (auto textChild = dynamic_cast<Text *>(child.get())) {
         const auto size = MeasureTextEx(::GetFontDefault(), textChild->InnerText.c_str(), childStyle.fontSize, 1.0f);
         childStyle.width = static_cast<int>(size.x);
@@ -201,6 +206,20 @@ namespace slam::ui {
     if (finalStyle.visible && this->id != "canvas")
       Draw(finalStyle, offset);
 
+    // Handle overflow clipping
+    bool needsClipping = finalStyle.overflowHidden;
+    if (needsClipping) {
+      const Rectangle clipRect = {
+        finalStyle.position.x + offset.x + static_cast<float>(finalStyle.padding),
+        finalStyle.position.y + offset.y + static_cast<float>(finalStyle.padding),
+        static_cast<float>(finalStyle.width - 2 * finalStyle.padding),
+        static_cast<float>(finalStyle.height - 2 * finalStyle.padding)
+      };
+
+      BeginScissorMode(static_cast<int>(clipRect.x), static_cast<int>(clipRect.y),
+                       static_cast<int>(clipRect.width), static_cast<int>(clipRect.height));
+    }
+
     std::vector<std::pair<Element *, int>> sortedChildren;
     for (const auto &child: children) {
       Style childStyle = canvas->styles.Resolve(child.get());
@@ -212,6 +231,11 @@ namespace slam::ui {
 
     for (const auto &[child, _]: sortedChildren) {
       child->_draw(offset + finalStyle.position);
+    }
+
+    // Disable clipping if it was enabled
+    if (needsClipping) {
+      EndScissorMode();
     }
   }
 

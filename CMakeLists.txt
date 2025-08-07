@@ -47,6 +47,8 @@ add_library(engine STATIC
         engine/src/ui/Slider.cpp
         engine/include/ui/Slider.h
         engine/include/ui/UIElements.h
+        engine/include/ui/TextInput.h
+        engine/src/ui/TextInput.cpp
 )
 
 target_include_directories(engine PUBLIC
