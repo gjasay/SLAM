@@ -23,7 +23,7 @@ SLAM is a 3D game engine built on top of raylib in C++23.
     - Panels
     - Buttons
     - Text
-    - Interactive elements (sliders, etc.)
+    - Interactive elements (sliders, text input box, etc.)
     - Custom element support
 
 ### Development Features
