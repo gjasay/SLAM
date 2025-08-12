@@ -76,6 +76,6 @@ namespace slam::ui {
 
     void SetupTextElement();
     void SetupCursorElement();
-    void SetupContainer() const;
+    void SetupContainer();
   };
 }

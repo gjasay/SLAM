@@ -1,4 +1,5 @@
 #include "./ui/TextInput.h"
+#include "ui/UIFactory.h"
 
 namespace slam::ui {
   void KeyRepeatHandler::Update(float dt, bool keyDown, std::function<void()> action) {
@@ -27,7 +28,6 @@ namespace slam::ui {
     timer = 0.0f;
   }
 
-  // CursorBlinker implementation
   void CursorBlinker::Update(float dt, bool isNavigating) {
     if (isNavigating) {
       isVisible = true;
@@ -60,38 +60,16 @@ namespace slam::ui {
     SetupCursorElement();
   }
 
-  void TextInput::SetupContainer() const {
-    this->defaultStyle->borderColor = ::GRAY;
-    this->defaultStyle->borderWidth = 1;
-    this->defaultStyle->borderRadius = 0.1f;
-    this->defaultStyle->width = 200;
-    this->defaultStyle->height = 40;
-    this->defaultStyle->padding = 10;
-    this->defaultStyle->flex = false;
-    this->defaultStyle->overflowHidden = true;
+  void TextInput::SetupContainer() {
+    Factory::SetupInputContainer(this, 200, 40, 0.1f);
   }
 
   void TextInput::SetupTextElement() {
-    textElement = dynamic_cast<Text*>(this->AddChild(std::make_unique<Text>("")));
-    if (textElement) {
-      textElement->defaultStyle->fontSize = 20;
-      textElement->defaultStyle->color = ::BLACK;
-      textElement->defaultStyle->padding = 0;
-      textElement->defaultStyle->marginLeft = 0;
-      textElement->defaultStyle->absolutePosition = true;
-    }
+    textElement = Factory::AddText(this, "", 20, ::BLACK);
   }
 
   void TextInput::SetupCursorElement() {
-    cursorElement = dynamic_cast<Text*>(this->AddChild(std::make_unique<Text>("_")));
-    if (cursorElement) {
-      cursorElement->defaultStyle->fontSize = 20;
-      cursorElement->defaultStyle->color = ::BLACK;
-      cursorElement->defaultStyle->padding = 0;
-      cursorElement->defaultStyle->marginLeft = 0;
-      cursorElement->defaultStyle->zIndex = 1;
-      cursorElement->defaultStyle->absolutePosition = true;
-    }
+    cursorElement = Factory::AddCursor(this, 20, ::BLACK);
   }
 
   void TextInput::OnUpdate(float dt) {
@@ -158,7 +136,6 @@ namespace slam::ui {
   void TextInput::HandleEditing(float dt) {
     const bool ctrlDown = ::IsKeyDown(::KEY_LEFT_CONTROL) || ::IsKeyDown(::KEY_RIGHT_CONTROL);
 
-    // Deletion with repeat
     keyHandlers["ctrlBackspace"].Update(dt, ctrlDown && ::IsKeyDown(::KEY_BACKSPACE), [&]() {
       DeletePreviousWord();
     });

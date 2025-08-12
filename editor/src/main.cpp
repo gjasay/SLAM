@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     };
   }
 
-  scene->canvas.AddElement(std::make_unique<slam::ui::TextInput>());
+  scene->canvas.AddElement(std::make_unique<slam::ui::ExpandableTextInput>());
 
   engine.SetScene(std::move(scene));
   engine.Run();

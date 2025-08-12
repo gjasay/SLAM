@@ -45,10 +45,14 @@ add_library(engine STATIC
         engine/include/ui/BasicElements.h
         engine/src/ui/BasicElements.cpp
         engine/src/ui/Slider.cpp
+        engine/src/ui/RenderHelpers.cpp
+        engine/src/ui/UIFactory.cpp
         engine/include/ui/Slider.h
         engine/include/ui/UIElements.h
         engine/include/ui/TextInput.h
         engine/src/ui/TextInput.cpp
+        engine/include/ui/ExpandableTextInput.h
+        engine/src/ui/ExpandableTextInput.cpp
 )
 
 target_include_directories(engine PUBLIC
